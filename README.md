@@ -1,7 +1,3 @@
-# Wordpress Plugin Boilderplate
+# Active Directory Integration
 
-Copy the contents of the folder and run the below command, from the plugin folder, in your terminal to run the setup guide.
-
-```
-sh setup.sh
-```
+Integration with the simple active directory api service
