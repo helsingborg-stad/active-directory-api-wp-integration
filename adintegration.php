@@ -34,4 +34,6 @@ $loader->addPrefix('adApiWpIntegration', ADAPIWPINTEGRATION_PATH . 'source/php/'
 $loader->register();
 
 // Start application
-new adApiWpIntegration\App();
+add_action('init', function () {
+    new adApiWpIntegration\App();
+});

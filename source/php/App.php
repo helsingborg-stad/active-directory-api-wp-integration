@@ -16,7 +16,7 @@ class App
 
     public function fetchUser($username, $password)
     {
-        if (!empty($username) && !empty($password) && username_exists($username)) {
+        if (!empty($username) && !empty($password) && !username_exists($username)) {
 
             //Create login post data
             $data = array(

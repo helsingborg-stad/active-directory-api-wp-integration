@@ -14,18 +14,8 @@ class Curl
      * @return string              The request response
      */
 
-    public $useCache = true;
-    private $cacheKey;
-
     public function request($type, $url, $data = null, $contentType = 'json', $headers = null)
     {
-        //Create cache key as a reference
-        $this->cacheKey = $this->createCacheKey($type, $url, $data, $contentType, $headers);
-
-        //Return cached data
-        if ($this->useCache && $this->getCachedResponse() !== false && !empty($this->getCachedResponse())) {
-            return $this->getCachedResponse();
-        }
 
         //Arguments are stored here
         $arguments = null;
@@ -57,6 +47,7 @@ class Curl
              * Method: POST
              */
             case 'POST':
+            echo "post";
                 // Set curl options for POST
                 $arguments = array(
                     CURLOPT_RETURNTRANSFER      => 1,
@@ -87,53 +78,8 @@ class Curl
         curl_close($ch);
 
         /**
-         * Cache response
-         */
-        $this->storeResponse($response);
-
-        /**
          * Return the response
          */
         return $response;
-    }
-
-    /**
-     * Create Cache key
-     * @param  string $type        Request type
-     * @param  string $url         Request url
-     * @param  array $data         Request data
-     * @param  string $contentType Content type
-     * @param  array $headers      Request headers
-     * @return string              The cache key
-     */
-
-    public function createCacheKey($type, $url, $data = null, $contentType = 'json', $headers = null)
-    {
-        $this->cacheKey = "curl_cache_".md5($type.$url.(is_array($data) ? implode($data, "") : $data).$contentType.(is_array($headers) ? implode($headers, "") : $headers));
-        return $this->cacheKey;
-    }
-
-    /**
-     * Get cached response
-     * @return string       The request response from cache
-     */
-    public function getCachedResponse()
-    {
-        return html_entity_decode(wp_cache_get($this->cacheKey, 'modularity-curl'));
-    }
-
-    /**
-     * Store response in cache
-     * @param $response     Response to save in cache
-     * @param $minutes      Number of minutes to cache response
-     * @return string       The request response from cache
-     */
-    public function storeResponse($response, $minutes = 1)
-    {
-        if (!empty($response) && !is_null($response)) {
-            return wp_cache_add($this->cacheKey, $response, 'modularity-curl', 60 * $minutes);
-        } else {
-            return false;
-        }
     }
 }
