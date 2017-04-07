@@ -4,27 +4,49 @@ namespace adApiWpIntegration;
 
 class App
 {
+
+    private $curl;
+
     public function __construct()
     {
-        add_action('admin_enqueue_scripts', array($this, 'enqueueStyles'));
-        add_action('admin_enqueue_scripts', array($this, 'enqueueScripts'));
-    }
+        $this->curl = new Helper\Curl();
 
-    /**
-     * Enqueue required style
-     * @return void
-     */
-    public function enqueueStyles()
-    {
 
     }
 
-    /**
-     * Enqueue required scripts
-     * @return void
-     */
-    public function enqueueScripts()
+    public function fetchUser($username, $password)
     {
+        if (!empty($username) && !empty($password) && username_exists($username)) {
 
+            //Create login post data
+            $data = array(
+                'username' => $username,
+                'password' => $password
+            );
+
+            //Make Curl
+            $result = $this->curl->request('POST', 'https://intranat.helsingborg.se/ad-api/user/current', $data);
+
+            var_dump($result);
+
+            //Return result
+            return $result;
+
+        }
+
+        return false;
+    }
+
+    public function validateLogin($data)
+    {
+        if ($data) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function validateLocalUsername()
+    {
     }
 }
