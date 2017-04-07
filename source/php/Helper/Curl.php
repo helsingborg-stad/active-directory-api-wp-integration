@@ -47,16 +47,20 @@ class Curl
              * Method: POST
              */
             case 'POST':
-            echo "post";
                 // Set curl options for POST
                 $arguments = array(
                     CURLOPT_RETURNTRANSFER      => 1,
                     CURLOPT_URL                 => $url,
                     CURLOPT_POST                => 1,
                     CURLOPT_HEADER              => false,
-                    CURLOPT_POSTFIELDS          => http_build_query($data),
-                    CURLOPT_CONNECTTIMEOUT_MS  => 3000
+                    CURLOPT_CONNECTTIMEOUT_MS   => 3000
                 );
+
+                if (in_array($contentType, array("json", "jsonp"))) {
+                    $arguments[CURLOPT_POSTFIELDS] = json_encode($data);
+                } else {
+                    $arguments[CURLOPT_POSTFIELDS] = http_build_query($data) ;
+                }
 
                 break;
         }
