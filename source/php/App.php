@@ -71,7 +71,7 @@ class App
             );
 
             //Make Curl
-            $result = $this->curl->request('POST', 'https://intranat.helsingborg.se/ad-api/user/current', $data, 'json', array('Content-Type: application/json'));
+            $result = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/current', $data, 'json', array('Content-Type: application/json'));
 
             //Decode
             $result = json_decode($result);

@@ -16,7 +16,7 @@ class Admin
 
         //Display error message (not valid url)
         if (filter_var(AD_INTEGRATION_URL, FILTER_VALIDATE_URL) === false) {
-            $this->storeMessage(__("The AD_INTEGRATION_URL provided is not a properly formatted url.", 'adintegration'));
+            $this->storeMessage(__("The AD_INTEGRATION_URL provided is not a properly formatted url (should be with https:// and pointing at the base directory of the api).", 'adintegration'));
         }
 
         $this->render();

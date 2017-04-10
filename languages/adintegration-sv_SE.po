@@ -1,0 +1,56 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Active Directory Integration\n"
+"POT-Creation-Date: 2017-04-10 15:40+0200\n"
+"PO-Revision-Date: 2017-04-10 15:40+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: sv_SE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.12\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-WPHeader: adintegration.php\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: source/php/Admin.php:14
+msgid "Please add AD_INTEGRATION_URL to this sites configuration file(s)."
+msgstr ""
+"Vänligen lägg till konstanten AD_INTEGRATION_URL till den här webbplatsens "
+"konfigurationsfiler. "
+
+#: source/php/Admin.php:19
+msgid ""
+"The AD_INTEGRATION_URL provided is not a properly formatted url (should be "
+"with https:// and pointing at the base directory of the api)."
+msgstr ""
+"Konstanten AD_INTEGRATION_URL som du har angett är inte en giltig "
+"webbadress. Adressen ska börja med https:// och peka på rootkatalogen av api-"
+"tjänsten."
+
+#. Plugin Name of the plugin/theme
+msgid "Active Directory Integration"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "https://github.com/helsingborg-stad/active-directory-api-wp-integration"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "Integration with the simple active directory api service"
+msgstr "Integration mot ”simple active directory” api-tjänst. "
+
+#. Author of the plugin/theme
+msgid "Sebastian Thulin"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "https://github.com/sebastianthulin"
+msgstr ""
