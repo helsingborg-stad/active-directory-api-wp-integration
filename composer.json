@@ -1,0 +1,13 @@
+{
+    "name": "helsingborg-stad/active-directory-api-wp-integration",
+    "description": "Simple plugin for verification of existing WordPress users with api.",
+    "type": "wordpress-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sebastian Thulin",
+            "email": "sebastian.thulin@helsingborg.se"
+        }
+    ],
+    "require": {}
+}
