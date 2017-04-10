@@ -4,4 +4,4 @@ Integration with the simple active directory api service (https://github.com/hel
 
 - Only allow local WordPress users to login (their usernames must match those in active directory)
 - Use the password stored in active-directory for matching WordPress users. 
-- Update of users basic data like email, first name and last name. 
+- Update of users basic data like email, first name and last name on login. 
