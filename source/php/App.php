@@ -9,6 +9,10 @@ class App
     private $password;
     private $userId;
 
+    /**
+     * Init plugin with construct, only if constant is set and valid
+     * @return void
+     */
     public function __construct($username)
     {
 
@@ -27,6 +31,10 @@ class App
 
     }
 
+    /**
+     * Init login process.
+     * @return void
+     */
     public function init($username)
     {
 
@@ -60,6 +68,11 @@ class App
         }
     }
 
+
+    /**
+     * Get information from the api-service
+     * @return object / false
+     */
     private function fetchUser($username, $password)
     {
         if (!empty($username) && !empty($password) && is_numeric($this->userId)) {
@@ -87,6 +100,10 @@ class App
         return false;
     }
 
+    /**
+     * Validate that this is a true callback
+     * @return bool / null
+     */
     private function validateLogin($data, $username)
     {
         if (isset($data->error)) {
@@ -100,6 +117,10 @@ class App
         return null;
     }
 
+    /**
+     * Get username with email or slug (username)
+     * @return int/null
+     */
     private function getUserID($usernameOrEmail)
     {
         $user = get_user_by(is_email($usernameOrEmail) ? 'email' : 'slug', $usernameOrEmail);
@@ -111,6 +132,10 @@ class App
         return null;
     }
 
+    /**
+     * Authenticate user
+     * @return void
+     */
     private function signOn()
     {
         wp_set_auth_cookie($this->userId, true);

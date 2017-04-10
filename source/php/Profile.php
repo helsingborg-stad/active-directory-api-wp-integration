@@ -5,6 +5,10 @@ namespace adApiWpIntegration;
 class Profile
 {
 
+    /**
+     * Update user profile details
+     * @return void
+     */
     public function update($data, $user_id)
     {
         //Update name
@@ -30,6 +34,10 @@ class Profile
         wp_set_password(wp_generate_password(), $user_id);
     }
 
+    /**
+     * Parse recived data
+     * @return array
+     */
     private function parseDisplayName($string, $response = array())
     {
         $string = explode(" - ", $string);

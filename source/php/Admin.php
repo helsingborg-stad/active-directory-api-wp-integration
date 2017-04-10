@@ -7,6 +7,10 @@ class Admin
 
     private $message = array();
 
+    /**
+     * Define error messages on configuration errors.
+     * @return void
+     */
     public function __construct()
     {
         //Display error message (not defined)
@@ -22,6 +26,10 @@ class Admin
         $this->render();
     }
 
+    /**
+     * Render active error messages
+     * @return void
+     */
     private function render()
     {
         add_action('admin_notices', function () {
@@ -39,6 +47,10 @@ class Admin
         });
     }
 
+    /**
+     * Add error messages to error array
+     * @return void
+     */
     private function storeMessage($message)
     {
         $this->message[] = $message;
