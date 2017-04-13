@@ -27,8 +27,7 @@ class App
         }
 
         //Init
-        add_action('wp_authenticate', array($this,'init'));
-
+        add_action('wp_authenticate', array($this, 'init'));
     }
 
     /**
@@ -37,6 +36,11 @@ class App
      */
     public function init($username)
     {
+
+        //Translate email login to username
+        if (is_email($username)) {
+            $username = $this->emailToUsername();
+        }
 
         //Store to class
         $this->username = $username;
@@ -139,5 +143,20 @@ class App
     private function signOn()
     {
         wp_set_auth_cookie($this->userId, true);
+    }
+
+    /**
+     * Translate email to username
+     * @return void
+     */
+    private function emailToUsername($email)
+    {
+        if ($user = get_user_by('email', $email)) {
+            if (isset($user->user_login)) {
+                return $user->user_login;
+            }
+        }
+
+        return null;
     }
 }
