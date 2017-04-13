@@ -33,7 +33,11 @@ class App
         add_action('wp_authenticate', array($this, 'init'), 20);
     }
 
-    private function defualtSetting()
+    /**
+     * Default to basic settings if constants is undefined.
+     * @return void
+     */
+    public function defaultSettings()
     {
         if (!defined('AD_UPDATE_NAME')) {
             define('AD_UPDATE_NAME', true);
