@@ -26,8 +26,26 @@ class App
             return false;
         }
 
+        //Default settings
+        add_action('wp_authenticate', array($this, 'defaultSettings'), 10);
+
         //Init
-        add_action('wp_authenticate', array($this, 'init'));
+        add_action('wp_authenticate', array($this, 'init'), 20);
+    }
+
+    private function defualtSetting()
+    {
+        if (!defined('AD_UPDATE_NAME')) {
+            define('AD_UPDATE_NAME', true);
+        }
+
+        if (!defined('AD_UPDATE_EMAIL')) {
+            define('AD_UPDATE_EMAIL', true);
+        }
+
+        if (!defined('AD_SAVE_PASSWORD')) {
+            define('AD_SAVE_PASSWORD', false);
+        }
     }
 
     /**

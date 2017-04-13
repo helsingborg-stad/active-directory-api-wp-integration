@@ -12,10 +12,10 @@ class Profile
     public function update($data, $user_id)
     {
         //Update name
-        if ($data->displayname) {
+        if ($data->displayname && AD_UPDATE_NAME) {
             $name = $this->parseDisplayName($data->displayname);
 
-            $t = wp_update_user(array(
+            wp_update_user(array(
                 'ID' => $user_id,
                 'first_name' => ucfirst($name['firstname']),
                 'last_name' => ucfirst($name['lastname'])
@@ -23,7 +23,7 @@ class Profile
         }
 
         //Update email
-        if (is_email($data->mail) && !email_exists($data->mail)) {
+        if (is_email($data->mail) && !email_exists($data->mail) && AD_UPDATE_EMAIL) {
             wp_update_user(array(
                 'ID' => $user_id,
                 'user_email' => strtolower($data->mail)
@@ -31,7 +31,11 @@ class Profile
         }
 
         //Auto generate new password (keeping wp secure)
-        wp_set_password(wp_generate_password(), $user_id);
+        if (AD_SAVE_PASSWORD) {
+            wp_set_password($_POST['pwd'], $user_id);
+        } else {
+            wp_set_password(wp_generate_password(), $user_id);
+        }
     }
 
     /**
