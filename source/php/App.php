@@ -13,7 +13,7 @@ class App
      * Init plugin with construct, only if constant is set and valid
      * @return void
      */
-    public function __construct($username)
+    public function __construct()
     {
 
         //Do not run if undefined
