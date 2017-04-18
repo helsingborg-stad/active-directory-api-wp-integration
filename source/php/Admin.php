@@ -24,7 +24,7 @@ class Admin
         }
 
         //Both cannot be active
-        if (AD_RANDOM_PASSWORD && AD_SAVE_PASSWORD) {
+        if (AD_RANDOM_PASSWORD === true && AD_SAVE_PASSWORD === true) {
             $this->storeMessage(__("The AD_RANDOM_PASSWORD and AD_SAVE_PASSWORD constants cannot be true at the same time.", 'adintegration'));
         }
 
