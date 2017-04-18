@@ -23,6 +23,11 @@ class Admin
             $this->storeMessage(__("The AD_INTEGRATION_URL provided is not a properly formatted url (should be with https:// and pointing at the base directory of the api).", 'adintegration'));
         }
 
+        //Both cannot be active
+        if (AD_RANDOM_PASSWORD && AD_SAVE_PASSWORD) {
+            $this->storeMessage(__("The AD_RANDOM_PASSWORD and AD_SAVE_PASSWORD constants cannot be true at the same time.", 'adintegration'));
+        }
+
         $this->render();
     }
 

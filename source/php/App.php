@@ -27,7 +27,7 @@ class App
         }
 
         //Default settings
-        add_action('wp_authenticate', array($this, 'defaultSettings'), 10);
+        add_action('init', array($this, 'defaultSettings'), 10);
 
         //Init
         add_action('wp_authenticate', array($this, 'init'), 20);
@@ -49,6 +49,10 @@ class App
 
         if (!defined('AD_SAVE_PASSWORD')) {
             define('AD_SAVE_PASSWORD', false);
+        }
+
+        if (!defined('AD_RANDOM_PASSWORD')) {
+            define('AD_RANDOM_PASSWORD', true);
         }
     }
 
