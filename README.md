@@ -11,7 +11,7 @@ Integration with the simple active directory api service (https://github.com/hel
 - AD_UPDATE_EMAIL: Update email if it not belongs to another user account. 
 - AD_SAVE_PASSWORD: Wheter to save the ad-password (true) in WordPress. *
 - AD_RANDOM_PASSWORD: Block random password generator. *
-- AD_USER_DOMAIN: Define a domain that belongs to ad-users. *
+- AD_USER_DOMAIN: Define a domain that belongs to ad-users (to block password reset). *
 
 * Be careful setting these options. All of them are not compatible. For instance: You cannot save the password, and generate a random password.
 
