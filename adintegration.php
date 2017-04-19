@@ -35,5 +35,5 @@ $loader->register();
 
 //Run plugin
 new adApiWpIntegration\App();
-new adApiWpIntegration\Admin();
 new adApiWpIntegration\Password();
+new adApiWpIntegration\Admin();

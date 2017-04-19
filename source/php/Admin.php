@@ -13,6 +13,11 @@ class Admin
      */
     public function __construct()
     {
+        add_action('init', array($this, 'init'), 15);
+    }
+
+    public function init()
+    {
         //Display error message (not defined)
         if (!defined('AD_INTEGRATION_URL')) {
             $this->storeMessage(__("Please add AD_INTEGRATION_URL to this sites configuration file(s).", 'adintegration'));
@@ -30,6 +35,7 @@ class Admin
 
         $this->render();
     }
+
 
     /**
      * Render active error messages
