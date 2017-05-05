@@ -153,7 +153,7 @@ class App
      */
     private function getUserID($usernameOrEmail)
     {
-        $user = get_user_by(is_email($usernameOrEmail) ? 'email' : 'slug', $usernameOrEmail);
+        $user = get_user_by(is_email($usernameOrEmail) ? 'email' : 'login', $usernameOrEmail);
 
         if (is_object($user) && isset($user->ID)) {
             return $user->ID;
