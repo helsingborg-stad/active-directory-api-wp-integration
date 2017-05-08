@@ -65,7 +65,7 @@ class App
 
         //Translate email login to username
         if (is_email($username)) {
-            $username = $this->emailToUsername();
+            $username = $this->emailToUsername($username);
         }
 
         //Store to class
@@ -175,7 +175,7 @@ class App
      * Translate email to username
      * @return void
      */
-    private function emailToUsername($email)
+    private function emailToUsername($email = null)
     {
         if ($user = get_user_by('email', $email)) {
             if (isset($user->user_login)) {
