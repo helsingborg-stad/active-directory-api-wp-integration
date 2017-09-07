@@ -48,18 +48,31 @@ class Profile
 
         if (is_array($string)) {
             $response['department']     = $string[1];
-            $string                     = $string[0];
+            $string                     = trim($string[0]);
         }
 
         $string = explode(" ", $string);
 
         if (is_array($string)) {
-            $response['firstname']  = $string[1];
-            $response['lastname']   = $string[0];
+
+            //Get first name, and then remove it.
+            $response['firstname']  = $string[count($string)-1];
+            unset($string[count($string)-1]);
+
+            //Check if there is one or more last name(s) and use them.
+            if (!empty($string)) {
+                $response['lastname']   = implode(" ", $string);
+            } else {
+                $response['lastname']   = "";
+            }
+
         } else {
             $response['firstname']  = $string;
             $response['lastname']   = "";
         }
+
+        print_r($response);
+        exit;
 
         return $response;
     }
