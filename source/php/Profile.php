@@ -71,9 +71,6 @@ class Profile
             $response['lastname']   = "";
         }
 
-        print_r($response);
-        exit;
-
         return $response;
     }
 }
