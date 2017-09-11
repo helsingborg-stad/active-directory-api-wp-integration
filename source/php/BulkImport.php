@@ -17,6 +17,7 @@ class BulkImport
     private $curl;
     private $response;
     private $db;
+    private $sites;
 
     /**
      * Prevents password for being reset
@@ -42,6 +43,15 @@ class BulkImport
         add_action('init', function () {
             if (!wp_next_scheduled('ad_integration_bulk_import')) {
                 wp_schedule_event((strtotime("midnight") + (60*60*3)), 'daily', 'ad_integration_bulk_import');
+            }
+        });
+
+        //Set sites if is multiste
+        add_action('init', function () {
+            if (is_multisite()) {
+                $this->sites = get_sites();
+            } else {
+                $this->sites = null;
             }
         });
 
@@ -224,16 +234,21 @@ class BulkImport
 
     private function setUserRole($userId)
     {
-
-        //Update role
         if (is_multisite()) {
-            foreach (get_sites() as $site) {
-                switch_to_blog($site->blog_id);
+            if (defined('AD_BULK_IMPORT_PROPAGATE') && AD_BULK_IMPORT_PROPAGATE === true) {
+                foreach ($this->sites as $site) {
+                    switch_to_blog($site->blog_id);
+                    if (isset(get_userdata($userId)->roles) && !empty(get_userdata($userId)->roles)) {
+                        continue;
+                    }
+                    add_user_to_blog(get_current_blog_id(), $userId, $this->defaultRole);
+                    restore_current_blog();
+                }
+            } else {
                 if (isset(get_userdata($userId)->roles) && !empty(get_userdata($userId)->roles)) {
                     continue;
                 }
                 add_user_to_blog(get_current_blog_id(), $userId, $this->defaultRole);
-                restore_current_blog();
             }
         } else {
             if (isset(get_userdata($userId)->roles) && !empty(get_userdata($userId)->roles)) {
@@ -252,7 +267,7 @@ class BulkImport
     public function deleteAccount($userToDelete)
     {
         if (is_multisite()) {
-            foreach (get_sites() as $site) {
+            foreach ($this->sites as $site) {
                 switch_to_blog($site->blog_id);
 
                 if ($userId = username_exists($userToDelete)) {

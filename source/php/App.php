@@ -65,6 +65,11 @@ class App
             define('AD_BULK_IMPORT_ROLE', "subscriber");
         }
 
+        //Prapagate role
+        if (!defined('AD_BULK_IMPORT_PROPAGATE')) {
+            define('AD_BULK_IMPORT_PROPAGATE', true);
+        }
+
     }
 
     /**
