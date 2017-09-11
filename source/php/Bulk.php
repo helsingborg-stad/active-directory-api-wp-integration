@@ -2,11 +2,20 @@
 
 namespace adApiWpIntegration;
 
+/**
+ * Bulk importing
+ * Class for bulk import if users. This class only handles the syncronisation of user accounts.
+ * This does not updates the respective users profile. Refeer to the Profile Class to review the procedure of account detail updates.
+ * The cron may have to run multiple times when first creating users. After the init period, bulk importing should run smoothly.
+ **/
+
 class Bulk
 {
 
-    private $optionKey = "ad_integration_index";
+    private $index;
+    private $defaultRole;
     private $curl;
+    private $response;
     private $db;
 
     /**
@@ -15,23 +24,101 @@ class Bulk
      */
     public function __construct()
     {
+        //Do not run if not all requirements are set.
+        if ($this->bulkEnabled() === false) {
+            return;
+        }
+
         //Globals
         global $wpdb;
 
         //Init
         $this->curl = new Helper\Curl();
+        $this->response = new Helper\Response();
         $this->db = $wpdb;
+        $this->defaultRole = defined('AD_BULK_IMPORT_ROLE') ? AD_BULK_IMPORT_ROLE : "subscriber";
 
-        //Actions & crons
-        //add_action('init', array($this, 'updateIndex'));
-        //
-        //var_dump($this->diffUserAccounts());
-        //
-        //var_dump($this->reassignToUserId());
+        //Create cronjob
+        add_action('init', function () {
+            if (!wp_next_scheduled('ad_integration_bulk_import')) {
+                wp_schedule_event((strtotime("midnight") + (60*60*3)), 'daily', 'ad_integration_bulk_import');
+            }
+        });
+
+        //Hook cron
+        add_action('ad_integration_bulk_import', array($this, 'cron'));
+
+        //Manually test functionality
+        add_action('admin_init', function () {
+            if (isset($_GET['adbulkimport'])) {
+                $this->cron();
+            }
+        });
     }
 
-    public function updateIndex() : bool
+    /**
+     * Cron function, run this class
+     * @return bool
+     */
+
+    public function cron()
     {
+
+        //Increase memory and runtime
+        ini_set('memory_limit', "512M");
+        ini_set('max_execution_time', 60*60*60);
+
+        //Include required resources
+        require_once(ABSPATH . 'wp-admin/includes/user.php');
+
+        // Step 1: Get index
+        $this->index = $this->getIndex();
+
+        //Step 2: Create diffs
+        $createAccounts = $this->diffUserAccounts(true);
+        $deleteAccounts = $this->diffUserAccounts(false);
+
+        //Step 3: Delete these accounts
+        foreach ((array) $deleteAccounts as $accountName) {
+            $this->deleteAccount($accountName);
+        }
+
+        //Step 4: Create these accounts
+        foreach ((array) $createAccounts as $accountName) {
+            $this->createAccount($accountName);
+        }
+    }
+
+    /**
+     * Check if all details that are neeeded to run this function is defined.
+     * @return bool
+     */
+
+    private function bulkEnabled()
+    {
+        //Check if bulk should be done
+        if (!(defined('AD_BULK_IMPORT') && AD_BULK_IMPORT == true)) {
+            return false;
+        }
+
+        //Check if has master account details
+        if (!defined('AD_BULK_IMPORT_USER')||!defined('AD_BULK_IMPORT_PASSWORD')) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Connect to the ad-api and fetch all users avabile
+     * @return array
+     */
+    public function getIndex()
+    {
+        //Use cached response if less than 10 minutes has went (prevents abuse)
+        if ($cached = wp_cache_get('active_directory_index', 'activeDirectory')) {
+            return $cached;
+        }
 
         //Authentication
         $data = array(
@@ -42,17 +129,16 @@ class Bulk
         //Fetch index
         $index = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/index', $data, 'json', array('Content-Type: application/json'));
 
-        if (!empty($index)) {
-            $index = json_decode($index);
-
-            if (is_multisite()) {
-                return update_site_option($this->optionKey, $index);
-            } else {
-                return update_option($this->optionKey, $index, false);
-            }
+        //Validate json response
+        if ($this->response->isJsonError($index)) {
+            return false;
         }
 
-        return false;
+        //Cache response for some minutes
+        wp_cache_add('active_directory_index', json_decode($index), 'activeDirectory', 60*60*10);
+
+        //Return
+        return json_decode($index);
     }
 
     /**
@@ -66,19 +152,13 @@ class Bulk
     }
 
     /**
-     * Returns all accountnames registered in the ad index option
+     * Returns all accountnames registered in the ad index
      * @return array
      */
 
     public function getAdAccounts()
     {
-        if (is_multisite()) {
-            return get_site_option($this->optionKey);
-        } else {
-            return get_option($this->optionKey);
-        }
-
-        return false;
+        return $this->index;
     }
 
 
@@ -94,9 +174,9 @@ class Bulk
         $local = $this->getLocalAccounts();
 
         if ($getMissingAccountsLocally === true) {
-            return array_diff($ad, $local);
+            return array_diff((array) $ad, (array) $local);
         } else {
-            return array_diff($local, $ad);
+            return array_diff((array) $local, (array) $ad);
         }
     }
 
@@ -104,15 +184,75 @@ class Bulk
      * Creates a single user if it not exists.
      * @param string $userName A string with a username that corresponds to the ad username.
      * @param string $userEmail A string with a email adress that corresponds to the ad email adress.
-     * @return boolean
+     * @return boolean / user id
      */
 
-    public function createAccount($userName, $userEmail)
+    public function createAccount($userName)
     {
-        if (username_exists($userName) && email_exists($userEmail)) {
-            return wp_create_user($userName, wp_generate_password(), $userEmail);
+        if (!username_exists($userName)) {
+            $userId =  wp_create_user($userName, wp_generate_password(), $this->createFakeEmail($userName));
+
+            if ($userId) {
+                $this->setUserRole($userId);
+            }
         }
         return false;
+    }
+
+    /**
+     * Creates a fake, temporary email adress. We do not have any real details about the account here.
+     * @return string A fake randomly generated email.
+     */
+
+    public function createFakeEmail($userName)
+    {
+        if (defined('AD_USER_DOMAIN')) {
+            return "temp." . base_convert($userName . time(), 10, 32) . "@" . AD_USER_DOMAIN;
+        } else {
+            return "temp." . base_convert($userName . time(), 10, 32) . "@" . base_convert($userName . time(), 10, 32) . ".dev";
+        }
+    }
+
+    /**
+     * Update role, if account is newly created. If is multiste, assign to all sites.
+     * @param int $userId The user id to assign default role to.
+     * @return bool
+     */
+
+    private function setUserRole($userId)
+    {
+
+        //Update role
+        if (is_multisite()) {
+            foreach (get_sites() as $site) {
+                switch_to_blog($site->blog_id);
+                if (isset(get_userdata($userId)->roles) && !empty(get_userdata($userId)->roles)) {
+                    return false;
+                }
+                add_user_to_blog(get_current_blog_id(), $userId, $this->defaultRole);
+                restore_current_blog();
+            }
+        } else {
+            if (isset(get_userdata($userId)->roles) && !empty(get_userdata($userId)->roles)) {
+                return false;
+            }
+            wp_update_user(array('ID' => $user_id, 'role' => $this->defaultRole));
+        }
+    }
+
+    /**
+     * Delete and reassign content to user id defined by reassignToUserId function.
+     * @param  $userName the username that should be deleted.
+     * @return array
+     */
+
+    public function deleteAccount($userToDelete)
+    {
+        if ($userId = username_exists($userToDelete)) {
+            if ($reassign = $this->reassignToUserId()) {
+                wp_delete_user($userId, $reassign);
+            }
+        }
     }
 
     /**
@@ -136,20 +276,5 @@ class Bulk
         }
 
         return false;
-    }
-
-    /**
-     * Delete and reassign content to user id defined by reassignToUserId function.
-     * @param  $userName the username that should be deleted.
-     * @return array
-     */
-
-    public function deleteAccount($userName)
-    {
-        if ($userId = username_exists($userToDelete)) {
-            if ($reassign = $this->reassignToUserId()) {
-                wp_delete_user($userId, $reassign);
-            }
-        }
     }
 }
