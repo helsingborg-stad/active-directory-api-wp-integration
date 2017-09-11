@@ -246,7 +246,7 @@ class BulkImport
                 }
             } else {
                 if (isset(get_userdata($userId)->roles) && !empty(get_userdata($userId)->roles)) {
-                    continue;
+                    return;
                 }
                 add_user_to_blog(get_current_blog_id(), $userId, $this->defaultRole);
             }
