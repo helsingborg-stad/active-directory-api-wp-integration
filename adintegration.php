@@ -37,3 +37,4 @@ $loader->register();
 new adApiWpIntegration\App();
 new adApiWpIntegration\Password();
 new adApiWpIntegration\Admin();
+new adApiWpIntegration\Bulk();
