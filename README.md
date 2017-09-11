@@ -6,18 +6,18 @@ Integration with the simple active directory api service (https://github.com/hel
 - Use the password stored in active-directory for matching WordPress users. 
 - Update of users basic data like email, first name and last name on login. 
 
-# Options (Define constants)
+# Options (Define Constants)
 - AD_UPDATE_NAME: Update first and last name. 
 - AD_UPDATE_EMAIL: Update email if it not belongs to another user account. 
 - AD_SAVE_PASSWORD: Wheter to save the ad-password (true) in WordPress. *
 - AD_RANDOM_PASSWORD: Block random password generator. *
 - AD_USER_DOMAIN: Define a domain that belongs to ad-users (to block password reset). *
 
-# Options Bulk import (Define constants)
+# Options Bulk Import (Define Constants)
 - AD_BULK_IMPORT: Turn on or off bulk import (true/false)
 - AD_BULK_IMPORT_USER: User account that can read all items in the ad
 - AD_BULK_IMPORT_PASSWORD: Password to the account name above
-- AD_BULK_IMPORT_ROLE: Default role to assign new users 
+- AD_BULK_IMPORT_ROLE: Default role to assign new users (default to "subscriber")
 - AD_BULK_IMPORT_REASSIGN_USERNAME: Reassign content of deleted users to this username. Will fallback to first user if not set or the user is missing. 
 - AD_BULK_IMPORT_PROPAGATE: Propagate users on the whole network of blogs (default to true). 
 
