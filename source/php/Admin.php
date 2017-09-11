@@ -33,6 +33,11 @@ class Admin
             $this->storeMessage(__("The AD_RANDOM_PASSWORD and AD_SAVE_PASSWORD constants cannot be true at the same time.", 'adintegration'));
         }
 
+        //Bulk import
+        if (AD_BULK_IMPORT === true && (!defined('AD_BULK_IMPORT_USER')||!defined('AD_BULK_IMPORT_PASSWORD'))) {
+            $this->storeMessage(__("The AD_BULK_IMPORT is defined but AD_BULK_IMPORT_USER and/or AD_BULK_IMPORT_PASSWORD is not. This is required to enable bulkimport.", 'adintegration'));
+        }
+
         $this->render();
     }
 

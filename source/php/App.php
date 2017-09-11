@@ -30,7 +30,7 @@ class App
         add_action('init', array($this, 'defaultSettings'), 10);
 
         //Init
-        add_action('wp_authenticate', array($this, 'init'), 20);
+        add_action('wp_authenticate', array($this, 'hijackLogin'), 20);
     }
 
     /**
@@ -39,28 +39,39 @@ class App
      */
     public function defaultSettings()
     {
+
+        //Update the users first and last name§
         if (!defined('AD_UPDATE_NAME')) {
             define('AD_UPDATE_NAME', true);
         }
 
+        //Update the users email
         if (!defined('AD_UPDATE_EMAIL')) {
             define('AD_UPDATE_EMAIL', true);
         }
 
+        //Save the password entered by the user (this decreases the security)
         if (!defined('AD_SAVE_PASSWORD')) {
             define('AD_SAVE_PASSWORD', false);
         }
 
+        // Create a random passowrd
         if (!defined('AD_RANDOM_PASSWORD')) {
             define('AD_RANDOM_PASSWORD', true);
         }
+
+        // Bulk import default role
+        if (!defined('AD_BULK_IMPORT_ROLE')) {
+            define('AD_BULK_IMPORT_ROLE', "subscriber");
+        }
+
     }
 
     /**
      * Init login process.
      * @return void
      */
-    public function init($username)
+    public function hijackLogin($username)
     {
 
         //Translate email login to username

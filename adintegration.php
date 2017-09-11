@@ -34,7 +34,7 @@ $loader->addPrefix('adApiWpIntegration', ADAPIWPINTEGRATION_PATH . 'source/php/'
 $loader->register();
 
 //Run plugin
-new adApiWpIntegration\App();
-new adApiWpIntegration\Password();
-new adApiWpIntegration\Admin();
-new adApiWpIntegration\Bulk();
+new adApiWpIntegration\App(); //Init
+new adApiWpIntegration\Password(); //Do not allow ad-users to change their passwords
+new adApiWpIntegration\Admin(); // Sends admin panel errors & information
+new adApiWpIntegration\BulkImport(); // Import user accounts in bulk

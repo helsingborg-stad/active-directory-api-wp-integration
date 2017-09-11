@@ -9,7 +9,7 @@ namespace adApiWpIntegration;
  * The cron may have to run multiple times when first creating users. After the init period, bulk importing should run smoothly.
  **/
 
-class Bulk
+class BulkImport
 {
 
     private $index;
