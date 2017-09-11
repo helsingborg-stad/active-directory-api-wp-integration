@@ -227,7 +227,7 @@ class BulkImport
             foreach (get_sites() as $site) {
                 switch_to_blog($site->blog_id);
                 if (isset(get_userdata($userId)->roles) && !empty(get_userdata($userId)->roles)) {
-                    return false;
+                    continue;
                 }
                 add_user_to_blog(get_current_blog_id(), $userId, $this->defaultRole);
                 restore_current_blog();
