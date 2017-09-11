@@ -39,7 +39,7 @@ class Profile
         }
 
         //Auto generate new password (keeping wp secure)
-        if (AD_SAVE_PASSWORD && isset($_POST['pwd']) && !empty($_POST['pwd'])) {
+        if (!AD_RANDOM_PASSWORD && AD_SAVE_PASSWORD && isset($_POST['pwd']) && !empty($_POST['pwd'])) {
             wp_set_password($_POST['pwd'], $user_id);
         } elseif (AD_RANDOM_PASSWORD) {
             wp_set_password(wp_generate_password(), $user_id);
