@@ -189,13 +189,16 @@ class BulkImport
 
     public function createAccount($userName)
     {
-        if (!username_exists($userName)) {
+        if (!$userId = username_exists($userName)) {
             $userId =  wp_create_user($userName, wp_generate_password(), $this->createFakeEmail($userName));
 
             if ($userId) {
                 $this->setUserRole($userId);
             }
         }
+
+        $this->setUserRole($userId);
+
         return false;
     }
 
@@ -248,9 +251,23 @@ class BulkImport
 
     public function deleteAccount($userToDelete)
     {
-        if ($userId = username_exists($userToDelete)) {
-            if ($reassign = $this->reassignToUserId()) {
-                wp_delete_user($userId, $reassign);
+        if (is_multisite()) {
+            foreach (get_sites() as $site) {
+                switch_to_blog($site->blog_id);
+
+                if ($userId = username_exists($userToDelete)) {
+                    if ($reassign = $this->reassignToUserId()) {
+                        wp_delete_user($userId, $reassign);
+                    }
+                }
+
+                restore_current_blog();
+            }
+        } else {
+            if ($userId = username_exists($userToDelete)) {
+                if ($reassign = $this->reassignToUserId()) {
+                    wp_delete_user($userId, $reassign);
+                }
             }
         }
     }
