@@ -19,6 +19,8 @@ class BulkImport
     private $db;
     private $sites;
 
+    private $profile;
+
     /**
      * Prevents password for being reset
      * @return void
@@ -57,6 +59,7 @@ class BulkImport
 
         //Hook cron
         add_action('ad_integration_bulk_import', array($this, 'cron'));
+        add_action('ad_integration_bulk_update_profiles', array($this, 'updateProfiles'));
 
         //Manually test functionality
         add_action('admin_init', function () {
@@ -89,14 +92,21 @@ class BulkImport
         $deleteAccounts = $this->diffUserAccounts(false);
 
         //Step 3: Delete these accounts
-        foreach ((array) $deleteAccounts as $accountName) {
-            $this->deleteAccount($accountName);
+        if (is_array($deleteAccounts) && !empty($deleteAccounts)) {
+            foreach ((array) $deleteAccounts as $accountName) {
+                $this->deleteAccount($accountName);
+            }
         }
 
         //Step 4: Create these accounts
-        foreach ((array) $createAccounts as $accountName) {
-            $this->createAccount($accountName);
+        if (is_array($createAccounts) && !empty($createAccounts)) {
+            foreach ((array) $createAccounts as $accountName) {
+                $this->createAccount($accountName);
+            }
         }
+
+        //Step 5: Schedule profile updates
+        $this->scheduleUpdateProfiles();
     }
 
     /**
@@ -308,5 +318,69 @@ class BulkImport
         }
 
         return false;
+    }
+
+    /**
+     * Creates a schedule of 100 update profiles in bulk
+     * @return void
+     */
+
+    public function scheduleUpdateProfiles($cron = true)
+    {
+        $userAccounts = $this->getLocalAccounts();
+
+        if (is_array($userAccounts) &!empty($userAccounts)) {
+            $userAccounts = array_chunk($userAccounts, 250);
+            foreach ((array) $userAccounts as $index => $userChunk) {
+
+                //Schedule chunks with 60 seconds apart (minimum cron job trigger).
+                if ($cron === true) {
+                    wp_schedule_single_event(time() + ($index*60), 'ad_integration_bulk_update_profiles', (array) $userChunk);
+                } else {
+                    $this->updateProfiles($userChunk);
+                }
+            }
+        }
+    }
+
+    /**
+     * Update usernames
+     * @return void
+     */
+
+    public function updateProfiles($userNames)
+    {
+        if (!is_object($this->profile)) {
+            $this->profile = new Profile();
+        }
+
+        //Include required resources
+        require_once(ABSPATH . 'wp-admin/includes/user.php');
+
+        //Authentication
+        $data = array(
+            'username' => AD_BULK_IMPORT_USER,
+            'password' => AD_BULK_IMPORT_PASSWORD
+        );
+
+        //Fetch index
+        $userDataArray = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/get/' . implode("/", $userNames) ."/", $data, 'json', array('Content-Type: application/json'));
+
+        //Validate json response
+        if ($this->response->isJsonError($index)) {
+            return false;
+        }
+
+        //Decode
+        $userDataArray = json_decode($userDataArray);
+
+        //Update fetched users
+        if (is_array($userDataArray) && !empty($userDataArray)) {
+            foreach ($userDataArray as $user) {
+                if (isset($user->samaccountname) && $userId = username_exists($user->samaccountname)) {
+                    $this->profile->update($user, $userId);
+                }
+            }
+        }
     }
 }

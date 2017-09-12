@@ -18,6 +18,7 @@ class Profile
      */
     public function update($data, $user_id)
     {
+
         //Update name
         if ($data->displayname && AD_UPDATE_NAME) {
 
@@ -51,5 +52,8 @@ class Profile
                 update_user_meta($user_id, AD_META_PREFIX . apply_filters('adApiWpIntegration/profile/metaKey', $meta_key), $meta_value);
             }
         }
+
+        //Last updated by ad timestamp
+        update_user_meta($user_id, AD_META_PREFIX . apply_filters('adApiWpIntegration/profile/metaKey', "last_sync"), date("Y-m-d H:i:s"));
     }
 }

@@ -108,7 +108,7 @@ class App
             $result = $this->fetchUser($this->username, $this->password);
 
             //Validate signon
-            if ($this->validateLogin($result, $this->username)) {
+            if ($this->validateLogin($result, $this->username) && $result !== false) {
 
                 //Update user profile
                 $this->profile->update($result, $this->userId);
@@ -138,8 +138,16 @@ class App
                 'password' => $password
             );
 
+            //Json handler
+            $response = new Helper\Response();
+
             //Make Curl
             $result = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/current', $data, 'json', array('Content-Type: application/json'));
+
+            //Is json error
+            if (!$response::isJsonError($result)) {
+                return false;
+            }
 
             //Decode
             $result = json_decode($result);
