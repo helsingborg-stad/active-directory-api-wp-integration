@@ -145,7 +145,7 @@ class App
             $result = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/current', $data, 'json', array('Content-Type: application/json'));
 
             //Is json error
-            if (!$response::isJsonError($result)) {
+            if ($response::isJsonError($result)) {
                 return false;
             }
 

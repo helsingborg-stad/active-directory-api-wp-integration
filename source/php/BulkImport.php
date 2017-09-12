@@ -150,7 +150,7 @@ class BulkImport
         $index = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/index', $data, 'json', array('Content-Type: application/json'));
 
         //Validate json response
-        if ($this->response->isJsonError($index)) {
+        if ($this->response::isJsonError($index)) {
             return false;
         }
 
@@ -367,7 +367,7 @@ class BulkImport
         $userDataArray = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/get/' . implode("/", $userNames) ."/", $data, 'json', array('Content-Type: application/json'));
 
         //Validate json response
-        if ($this->response->isJsonError($index)) {
+        if ($this->response::isJsonError($index)) {
             return false;
         }
 
