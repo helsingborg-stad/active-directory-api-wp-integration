@@ -117,7 +117,7 @@ class BulkImport
     private function bulkEnabled()
     {
         //Check if bulk should be done
-        if (!(defined('AD_BULK_IMPORT') && AD_BULK_IMPORT == true)) {
+        if (!(defined('AD_BULK_IMPORT') || AD_BULK_IMPORT !== true)) {
             return false;
         }
 
@@ -344,7 +344,7 @@ class BulkImport
     }
 
     /**
-     * Update usernames
+     * Update user profiles (bulk trigger)
      * @return void
      */
 
