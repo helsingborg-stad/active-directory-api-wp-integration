@@ -222,7 +222,7 @@ class BulkImport
         }
 
         foreach ($userNames as $userName) {
-            if (in_array($userName, $this->getLocalAccounts())) {
+            if (!in_array($userName, $this->getLocalAccounts())) {
                 $userId =  wp_create_user($userName, wp_generate_password(), $this->createFakeEmail($userName));
 
                 if (is_numeric($userId)) {
