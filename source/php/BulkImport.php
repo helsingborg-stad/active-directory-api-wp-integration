@@ -21,6 +21,8 @@ class BulkImport
 
     private $profile;
 
+    private $localAccountCache = null;
+
     /**
      * Prevents password for being reset
      * @return void
@@ -170,7 +172,11 @@ class BulkImport
 
     public function getLocalAccounts()
     {
-        return $this->db->get_col("SELECT user_login FROM " . $this->db->users);
+        if (!is_null($this->localAccountCache)) {
+            return $this->localAccountCache;
+        }
+
+        return $this->localAccountCache = $this->db->get_col("SELECT user_login FROM " . $this->db->users);
     }
 
     /**
@@ -206,18 +212,24 @@ class BulkImport
      * Creates a single user if it not exists.
      * @param string $userName A string with a username that corresponds to the ad username.
      * @param string $userEmail A string with a email adress that corresponds to the ad email adress.
-     * @return boolean / user id
+     * @return void
      */
 
-    public function createAccount($userName)
+    public function createAccount($userNames)
     {
-        if (!$userId = username_exists($userName)) {
-            $userId =  wp_create_user($userName, wp_generate_password(), $this->createFakeEmail($userName));
+        if (!is_array($userNames)) {
+            $userNames = array($userNames);
         }
 
-        $this->setUserRole($userId);
+        foreach ($userNames as $userName) {
+            if (in_array($userName, $this->getLocalAccounts())) {
+                $userId =  wp_create_user($userName, wp_generate_password(), $this->createFakeEmail($userName));
 
-        return false;
+                if (is_numeric($userId)) {
+                    $this->setUserRole($userId);
+                }
+            }
+        }
     }
 
     /**
@@ -347,7 +359,6 @@ class BulkImport
 
     public function updateProfiles($userNames)
     {
-
         if (!is_array($userNames)) {
             return;
         }
