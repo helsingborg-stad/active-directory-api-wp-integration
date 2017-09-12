@@ -64,9 +64,11 @@ class BulkImport
         //Manually test functionality
         add_action('admin_init', function () {
             if (isset($_GET['adbulkimport'])) {
+                define('DOING_CRON', true);
                 $this->cron();
+                exit;
             }
-        });
+        }, 1);
     }
 
     /**
