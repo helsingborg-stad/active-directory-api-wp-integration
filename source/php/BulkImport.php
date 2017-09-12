@@ -22,6 +22,7 @@ class BulkImport
     private $profile;
 
     private $localAccountCache = null;
+    private $reassignToUserIdCache = null;
 
     /**
      * Prevents password for being reset
@@ -88,12 +89,18 @@ class BulkImport
         //Include required resources
         require_once(ABSPATH . 'wp-admin/includes/user.php');
 
+        echo date("H:i:s");
+
         // Step 1: Get index
         $this->index = $this->getIndex();
+
+        echo date("H:i:s");
 
         //Step 2: Create diffs
         $createAccounts = $this->diffUserAccounts(true);
         $deleteAccounts = $this->diffUserAccounts(false);
+
+        echo date("H:i:s");
 
         //Step 3: Delete these accounts
         if (is_array($deleteAccounts) && !empty($deleteAccounts)) {
@@ -102,6 +109,8 @@ class BulkImport
             }
         }
 
+        echo date("H:i:s");
+/*
         //Step 4: Create these accounts
         if (is_array($createAccounts) && !empty($createAccounts)) {
             foreach ((array) $createAccounts as $accountName) {
@@ -110,7 +119,7 @@ class BulkImport
         }
 
         //Step 5: Schedule profile updates
-        $this->scheduleUpdateProfiles();
+        $this->scheduleUpdateProfiles();*/
     }
 
     /**
@@ -286,20 +295,15 @@ class BulkImport
 
     public function deleteAccount($userToDelete)
     {
-        if (is_multisite()) {
-            foreach ($this->sites as $site) {
-                switch_to_blog($site->blog_id);
-
-                if ($userId = username_exists($userToDelete)) {
-                    if ($reassign = $this->reassignToUserId()) {
-                        wp_delete_user($userId, $reassign);
+        if ($userId = username_exists($userToDelete)) {
+            if (is_multisite()) {
+                if ($reassign = $this->reassignToUserId()) {
+                    foreach ($this->sites as $site) {
+                        remove_user_from_blog($userId, $site->blog_id, $reassign);
                     }
+                    $this->db->delete($this->db->users, array('ID' => $userId));
                 }
-
-                restore_current_blog();
-            }
-        } else {
-            if ($userId = username_exists($userToDelete)) {
+            } else {
                 if ($reassign = $this->reassignToUserId()) {
                     wp_delete_user($userId, $reassign);
                 }
@@ -314,6 +318,11 @@ class BulkImport
 
     public function reassignToUserId()
     {
+
+        if (!is_null($this->reassignToUserIdCache)) {
+            return $this->reassignToUserIdCache;
+        }
+
         //If there is a configurated username for reassignment, use it.
         if (defined('AD_BULK_IMPORT_REASSIGN_USERNAME') && $userId = username_exists(AD_BULK_IMPORT_REASSIGN_USERNAME)) {
             if ($userId) {
@@ -324,8 +333,11 @@ class BulkImport
         // Above wasen't defined. Get first user id.
         $user = $this->db->get_col("SELECT ID FROM " . $this->db->users . " LIMIT 1");
         if (is_array($user) && !empty($user)) {
-            return (int) array_pop($user);
+            $userId = (int) array_pop($user);
         }
+
+        // Store to cache
+        return $this->reassignToUserIdCache = $userId;
 
         return false;
     }
