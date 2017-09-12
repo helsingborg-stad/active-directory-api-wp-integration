@@ -46,5 +46,10 @@ class Profile
         }
 
         //Update meta
+        if (AD_UPDATE_META && (is_object($data)||is_array($data))) {
+            foreach ((array) $data as $meta_key => $meta_value) {
+                update_user_meta($user_id, AD_META_PREFIX . apply_filters('adApiWpIntegration/profile/metaKey', $meta_key), $meta_value);
+            }
+        }
     }
 }

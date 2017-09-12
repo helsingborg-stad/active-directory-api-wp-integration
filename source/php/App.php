@@ -40,7 +40,7 @@ class App
     public function defaultSettings()
     {
 
-        //Update the users first and last name§
+        //Update the users first and last name
         if (!defined('AD_UPDATE_NAME')) {
             define('AD_UPDATE_NAME', true);
         }
@@ -48,6 +48,16 @@ class App
         //Update the users email
         if (!defined('AD_UPDATE_EMAIL')) {
             define('AD_UPDATE_EMAIL', true);
+        }
+
+        //Update the users meta data
+        if (!defined('AD_UPDATE_META')) {
+            define('AD_UPDATE_META', true);
+        }
+
+        //Update the users meta data
+        if (!defined('AD_META_PREFIX')) {
+            define('AD_META_PREFIX', "ad_");
         }
 
         //Save the password entered by the user (this decreases the security)
@@ -65,11 +75,10 @@ class App
             define('AD_BULK_IMPORT_ROLE', "subscriber");
         }
 
-        //Prapagate role
+        //Propagate role
         if (!defined('AD_BULK_IMPORT_PROPAGATE')) {
             define('AD_BULK_IMPORT_PROPAGATE', true);
         }
-
     }
 
     /**

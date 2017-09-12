@@ -9,6 +9,8 @@ Integration with the simple active directory api service (https://github.com/hel
 # Options (Define Constants)
 - AD_UPDATE_NAME: Update first and last name. 
 - AD_UPDATE_EMAIL: Update email if it not belongs to another user account. 
+- AD_UPDATE_META: Update meta according to result (will use ad-keys as meta keys prefixed with below). **
+- AD_META_PREFIX: Prefix for metakeys stored in the database. **
 - AD_SAVE_PASSWORD: Wheter to save the ad-password (true) in WordPress. *
 - AD_RANDOM_PASSWORD: Block random password generator. *
 - AD_USER_DOMAIN: Define a domain that belongs to ad-users (to block password reset). *
@@ -22,5 +24,12 @@ Integration with the simple active directory api service (https://github.com/hel
 - AD_BULK_IMPORT_PROPAGATE: Propagate users on the whole network of blogs (default to true). 
 
 * Be careful setting these options. All of them are not compatible. For instance: You cannot save the password, and generate a random password.
+** Ad upodate meta should be set in order to enable ad_meta_prefix constant. 
 
-
+# Filters 
+Filter the meta keys stored in the database. 
+```php
+add_filter('adApiWpIntegration/profile/metaKey', function($meta_key){
+    return $meta_key; 
+}); 
+```
