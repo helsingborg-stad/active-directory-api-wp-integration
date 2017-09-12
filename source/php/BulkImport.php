@@ -334,10 +334,9 @@ class BulkImport
         if (is_array($userAccounts) &!empty($userAccounts)) {
             $userAccounts = array_chunk($userAccounts, 250);
             foreach ((array) $userAccounts as $index => $userChunk) {
-
                 //Schedule chunks with 60 seconds apart (minimum cron job trigger).
                 if ($cron === true) {
-                    wp_schedule_single_event(time() + ($index*60), 'ad_integration_bulk_update_profiles', (array) $userChunk);
+                    wp_schedule_single_event(time() + ($index*60), 'ad_integration_bulk_update_profiles', array('userNames' => $userChunk));
                 } else {
                     $this->updateProfiles($userChunk);
                 }
@@ -352,6 +351,11 @@ class BulkImport
 
     public function updateProfiles($userNames)
     {
+
+        if (!is_array($userNames)) {
+            return;
+        }
+
         if (!is_object($this->profile)) {
             $this->profile = new Profile();
         }
