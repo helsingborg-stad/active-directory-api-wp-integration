@@ -213,10 +213,6 @@ class BulkImport
     {
         if (!$userId = username_exists($userName)) {
             $userId =  wp_create_user($userName, wp_generate_password(), $this->createFakeEmail($userName));
-
-            if ($userId) {
-                $this->setUserRole($userId);
-            }
         }
 
         $this->setUserRole($userId);
