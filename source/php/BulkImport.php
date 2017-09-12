@@ -89,18 +89,12 @@ class BulkImport
         //Include required resources
         require_once(ABSPATH . 'wp-admin/includes/user.php');
 
-        echo date("H:i:s");
-
         // Step 1: Get index
         $this->index = $this->getIndex();
-
-        echo date("H:i:s");
 
         //Step 2: Create diffs
         $createAccounts = $this->diffUserAccounts(true);
         $deleteAccounts = $this->diffUserAccounts(false);
-
-        echo date("H:i:s");
 
         //Step 3: Delete these accounts
         if (is_array($deleteAccounts) && !empty($deleteAccounts)) {
@@ -109,8 +103,6 @@ class BulkImport
             }
         }
 
-        echo date("H:i:s");
-/*
         //Step 4: Create these accounts
         if (is_array($createAccounts) && !empty($createAccounts)) {
             foreach ((array) $createAccounts as $accountName) {
@@ -119,7 +111,7 @@ class BulkImport
         }
 
         //Step 5: Schedule profile updates
-        $this->scheduleUpdateProfiles();*/
+        $this->scheduleUpdateProfiles();
     }
 
     /**
