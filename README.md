@@ -33,3 +33,19 @@ add_filter('adApiWpIntegration/profile/metaKey', function($meta_key){
     return $meta_key; 
 }); 
 ```
+
+# Example configuration 
+```php
+ define('AD_INTEGRATION_URL', 'https://internalproductionserver.com/ad-api/');
+ define('AD_UPDATE_NAME', true);
+ define('AD_UPDATE_EMAIL', true);
+ define('AD_SAVE_PASSWORD', false);
+ define('AD_RANDOM_PASSWORD', true);
+ define('AD_USER_DOMAIN', 'company.com');
+
+ define('AD_BULK_IMPORT', true);
+ define('AD_BULK_IMPORT_USER', 'bulkimportaduser');
+ define('AD_BULK_IMPORT_PASSWORD', '*********');
+ define('AD_BULK_IMPORT_ROLE', 'subscriber');
+ define('AD_BULK_IMPORT_REASSIGN_USERNAME', 'administrator');
+```
