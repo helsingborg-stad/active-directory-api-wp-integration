@@ -33,16 +33,16 @@ class Profile
             $fields['user_email'] = strtolower($data->mail);
         }
 
+        //Update password
+        if (!AD_RANDOM_PASSWORD && AD_SAVE_PASSWORD && isset($_POST['pwd']) && !empty($_POST['pwd'])) {
+            $fields['user_pass'] = $_POST['pwd'];
+        } elseif (AD_RANDOM_PASSWORD) {
+            $fields['user_pass'] = wp_generate_password();
+        }
+
         //Update fields
         if(!empty($fields)) && count($fields) != 1) {
             wp_update_user($fields);
-        }
-
-        //Auto generate new password (keeping wp secure)
-        if (!AD_RANDOM_PASSWORD && AD_SAVE_PASSWORD && isset($_POST['pwd']) && !empty($_POST['pwd'])) {
-            wp_set_password($_POST['pwd'], $user_id);
-        } elseif (AD_RANDOM_PASSWORD) {
-            wp_set_password(wp_generate_password(), $user_id);
         }
 
         //Update meta
