@@ -78,11 +78,10 @@ class BulkImport
         add_action('admin_init', function(){
             if (isset($_GET['adbulkprofile'])) {
                 $userAccounts = $this->getLocalAccounts();
-                if (is_array($userAccounts) &!empty($userAccounts)) {
+                if (is_array($userAccounts) && !empty($userAccounts)) {
                     $userAccounts = array_chunk($userAccounts, 200);
                     foreach ((array) $userAccounts as $index => $userChunk) {
                         $this->updateProfiles($userChunk);
-                        exit;
                     }
                 }
                 exit;
