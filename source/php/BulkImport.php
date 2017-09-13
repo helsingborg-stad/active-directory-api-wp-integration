@@ -341,7 +341,7 @@ class BulkImport
         $userAccounts = $this->getLocalAccounts();
 
         if (is_array($userAccounts) &!empty($userAccounts)) {
-            $userAccounts = array_chunk($userAccounts, 250);
+            $userAccounts = array_chunk($userAccounts, 200);
             foreach ((array) $userAccounts as $index => $userChunk) {
                 //Schedule chunks with 60 seconds apart (minimum cron job trigger).
                 if ($cron === true) {
