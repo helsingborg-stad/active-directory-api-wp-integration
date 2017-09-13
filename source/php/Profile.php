@@ -25,14 +25,14 @@ class Profile
         $fields = array('ID' => $user_id);
 
         //Update name
-        if ($data->displayname && AD_UPDATE_NAME) {
+        if (AD_UPDATE_NAME && isset($data->displayname) && !empty($data->displayname)) {
             $name = $this->format::parseDisplayName($data->displayname);
             $fields['first_name'] = $name['firstname'];
             $fields['last_name'] = $name['lastname'];
         }
 
         //Update email
-        if (isset($data->mail) && is_email($data->mail) && AD_UPDATE_EMAIL) {
+        if (AD_UPDATE_EMAIL && isset($data->mail) && is_email($data->mail)) {
             $fields['user_email'] = strtolower($data->mail);
         }
 
