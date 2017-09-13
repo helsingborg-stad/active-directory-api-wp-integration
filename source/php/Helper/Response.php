@@ -11,7 +11,7 @@ class Response
     public static function isJsonError($response)
     {
         if ($decoded = json_decode($response)) {
-            $response = $decoded;
+            $response = (array) $decoded;
         }
 
         if (isset($response['error'])) {

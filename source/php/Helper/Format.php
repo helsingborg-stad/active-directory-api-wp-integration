@@ -27,7 +27,7 @@ class Format
         $string = explode(" - ", $string);
 
         if (is_array($string)) {
-            $response['department']     = $string[1];
+            $response['department']     = isset($string[1]) ? $string[1] : "";
             $string                     = trim($string[0]);
         }
 

@@ -26,6 +26,9 @@ class App
             return false;
         }
 
+        //Disable emails to be sent
+        $this->disabledNotificationEmails();
+
         //Default settings
         add_action('init', array($this, 'defaultSettings'), 10);
 
@@ -34,9 +37,20 @@ class App
     }
 
     /**
+     * Since all account handling is automatic, we dosen't want to send any email.
+     * @return void
+     */
+
+    public function disabledNotificationEmails() {
+        add_filter('send_password_change_email', '__return_false');
+        add_filter('send_email_change_email', '__return_false');
+    }
+
+    /**
      * Default to basic settings if constants is undefined.
      * @return void
      */
+
     public function defaultSettings()
     {
 

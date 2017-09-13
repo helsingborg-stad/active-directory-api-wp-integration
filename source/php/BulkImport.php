@@ -73,6 +73,27 @@ class BulkImport
                 exit;
             }
         }, 5);
+
+        //Manually test update profiles cron
+        add_action('admin_init', function(){
+
+            if (isset($_GET['adbulkprofile'])) {
+
+                $userAccounts = $this->getLocalAccounts();
+
+                if (is_array($userAccounts) &!empty($userAccounts)) {
+
+                    $userAccounts = array_chunk($userAccounts, 200);
+                    foreach ((array) $userAccounts as $index => $userChunk) {
+                        echo date("i:s");
+                        $this->updateProfiles($userChunk);
+                        echo date("i:s");
+                        exit;
+                    }
+                }
+            }
+        }, 5);
+
     }
 
     /**
@@ -263,7 +284,7 @@ class BulkImport
 
     public function deleteAccount($userToDelete)
     {
-        if ($userId = username_exists($userToDelete)) {
+        if ($userId = $this->userNameExists($userToDelete)) {
             if (is_multisite()) {
                 if ($reassign = $this->reassignToUserId()) {
                     foreach ($this->sites as $site) {
@@ -292,7 +313,7 @@ class BulkImport
         }
 
         //If there is a configurated username for reassignment, use it.
-        if (defined('AD_BULK_IMPORT_REASSIGN_USERNAME') && $userId = username_exists(AD_BULK_IMPORT_REASSIGN_USERNAME)) {
+        if (defined('AD_BULK_IMPORT_REASSIGN_USERNAME') && $userId = $this->userNameExists(AD_BULK_IMPORT_REASSIGN_USERNAME)) {
             if ($userId) {
                 return $userId;
             }
@@ -360,7 +381,7 @@ class BulkImport
         $userDataArray = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/get/' . implode("/", $userNames) ."/", $data, 'json', array('Content-Type: application/json'));
 
         //Validate json response
-        if ($this->response::isJsonError($index)) {
+        if ($this->response::isJsonError($userDataArray)) {
             return false;
         }
 
@@ -370,10 +391,26 @@ class BulkImport
         //Update fetched users
         if (is_array($userDataArray) && !empty($userDataArray)) {
             foreach ($userDataArray as $user) {
-                if (isset($user->samaccountname) && $userId = username_exists($user->samaccountname)) {
-                    $this->profile->update($user, $userId);
+                if (isset($user->samaccountname) && $userId = $this->userNameExists($user->samaccountname)) {
+                    $this->profile->update($user, $userId, false);
                 }
             }
         }
     }
+
+    /**
+     * Username exists
+     * @return numeric/bool Returns the user id found, otherwise false. Does not use usename_exists due to the creation of WpObject on each call.
+     */
+
+    public function userNameExists($username) {
+        $user = $this->db->get_col(
+                    $this->db->prepare("SELECT ID FROM " . $this->db->users . " WHERE user_login = %s LIMIT 1", $username)
+                );
+        if (is_array($user) && !empty($user)) {
+            return (int) array_pop($user);
+        }
+        return false;
+    }
+
 }
