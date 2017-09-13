@@ -19,6 +19,7 @@ class Profile
     public function update($data, $user_id)
     {
 
+        //Basic definition with only an id
         $fields = array('ID' => $user_id);
 
         //Update name
@@ -41,7 +42,7 @@ class Profile
         }
 
         //Update fields
-        if(!empty($fields)) && count($fields) != 1) {
+        if(count($fields) != 1) {
             wp_update_user($fields);
         }
 
