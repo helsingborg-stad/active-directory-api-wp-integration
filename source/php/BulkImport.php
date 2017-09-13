@@ -64,6 +64,10 @@ class BulkImport
         add_action('ad_integration_bulk_import', array($this, 'cron'));
         add_action('ad_integration_bulk_update_profiles', array($this, 'updateProfiles'));
 
+        /**
+         * The following code in constructor is manual tests of functionality.
+         */
+
         //Manually test functionality
         add_action('admin_init', function () {
             if (isset($_GET['adbulkimport'])) {
@@ -77,6 +81,12 @@ class BulkImport
         //Manually test update profiles cron
         add_action('admin_init', function(){
             if (isset($_GET['adbulkprofile'])) {
+                define('DOING_CRON', true);
+
+                //Increase memory and runtime
+                ini_set('memory_limit', "512M");
+                ini_set('max_execution_time', 60*60*60);
+
                 $userAccounts = $this->getLocalAccounts();
                 if (is_array($userAccounts) && !empty($userAccounts)) {
                     $userAccounts = array_chunk($userAccounts, 200);
