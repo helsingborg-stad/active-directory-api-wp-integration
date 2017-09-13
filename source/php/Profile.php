@@ -19,24 +19,23 @@ class Profile
     public function update($data, $user_id)
     {
 
+        $fields = array('ID' => $user_id);
+
         //Update name
         if ($data->displayname && AD_UPDATE_NAME) {
-
             $name = $this->format::parseDisplayName($data->displayname);
-
-            wp_update_user(array(
-                'ID' => $user_id,
-                'first_name' => $name['firstname'],
-                'last_name' => $name['lastname']
-            ));
+            $fields['first_name'] = $name['firstname'];
+            $fields['last_name'] = $name['lastname'];
         }
 
         //Update email
         if (is_email($data->mail) && !email_exists($data->mail) && AD_UPDATE_EMAIL) {
-            wp_update_user(array(
-                'ID' => $user_id,
-                'user_email' => strtolower($data->mail)
-            ));
+            $fields['user_email'] = strtolower($data->mail);
+        }
+
+        //Update fields
+        if(!empty($fields)) && count($fields) != 1) {
+            wp_update_user($fields);
         }
 
         //Auto generate new password (keeping wp secure)
