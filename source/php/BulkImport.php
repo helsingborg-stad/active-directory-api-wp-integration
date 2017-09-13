@@ -69,9 +69,10 @@ class BulkImport
             if (isset($_GET['adbulkimport'])) {
                 define('DOING_CRON', true);
                 $this->cron();
+                $this->scheduleUpdateProfiles();
                 exit;
             }
-        }, 1);
+        }, 5);
     }
 
     /**
@@ -89,28 +90,27 @@ class BulkImport
         //Include required resources
         require_once(ABSPATH . 'wp-admin/includes/user.php');
 
-        // Step 1: Get index
-        $this->index = $this->getIndex();
-
-        //Step 2: Create diffs
+        //Step 1: Create diffs
         $createAccounts = $this->diffUserAccounts(true);
         $deleteAccounts = $this->diffUserAccounts(false);
 
-        //Step 3: Delete these accounts
+        //Step 2: Delete these accounts
         if (is_array($deleteAccounts) && !empty($deleteAccounts)) {
             foreach ((array) $deleteAccounts as $accountName) {
                 $this->deleteAccount($accountName);
             }
         }
 
-        //Step 4: Create these accounts
+        //Step 3: Create these accounts
         if (is_array($createAccounts) && !empty($createAccounts)) {
             foreach ((array) $createAccounts as $accountName) {
-                $this->createAccount($accountName);
+                if(!in_array($accountName, $deleteAccounts)) {
+                    $this->createAccount($accountName);
+                }
             }
         }
 
-        //Step 5: Schedule profile updates
+        //Step 4: Schedule profile updates
         $this->scheduleUpdateProfiles();
     }
 
@@ -135,16 +135,26 @@ class BulkImport
     }
 
     /**
-     * Connect to the ad-api and fetch all users avabile
+     * Return all local accountnames
      * @return array
      */
-    public function getIndex()
+
+    public function getLocalAccounts()
     {
-        //Use cached response if less than 10 minutes has went (prevents abuse)
-        if ($cached = wp_cache_get('active_directory_index', 'activeDirectory')) {
-            return $cached;
+        if (!is_null($this->localAccountCache)) {
+            return $this->localAccountCache;
         }
 
+        return $this->localAccountCache = array_map('strtolower', $this->db->get_col("SELECT user_login FROM " . $this->db->users));
+    }
+
+    /**
+     * Returns all accountnames registered in the ad index
+     * @return array
+     */
+
+    public function getAdAccounts()
+    {
         //Authentication
         $data = array(
             'username' => AD_BULK_IMPORT_USER,
@@ -159,35 +169,8 @@ class BulkImport
             return false;
         }
 
-        //Cache response for some minutes
-        wp_cache_add('active_directory_index', json_decode($index), 'activeDirectory', 60*60*10);
-
         //Return
-        return json_decode($index);
-    }
-
-    /**
-     * Return all local accountnames
-     * @return array
-     */
-
-    public function getLocalAccounts()
-    {
-        if (!is_null($this->localAccountCache)) {
-            return $this->localAccountCache;
-        }
-
-        return $this->localAccountCache = $this->db->get_col("SELECT user_login FROM " . $this->db->users);
-    }
-
-    /**
-     * Returns all accountnames registered in the ad index
-     * @return array
-     */
-
-    public function getAdAccounts()
-    {
-        return $this->index;
+        return array_map('strtolower', json_decode($index));
     }
 
 
@@ -224,6 +207,7 @@ class BulkImport
 
         foreach ($userNames as $userName) {
             if (!in_array($userName, $this->getLocalAccounts())) {
+
                 $userId =  wp_create_user($userName, wp_generate_password(), $this->createFakeEmail($userName));
 
                 if (is_numeric($userId)) {
@@ -258,17 +242,9 @@ class BulkImport
         if (is_multisite()) {
             if (defined('AD_BULK_IMPORT_PROPAGATE') && AD_BULK_IMPORT_PROPAGATE === true) {
                 foreach ($this->sites as $site) {
-                    switch_to_blog($site->blog_id);
-                    if (isset(get_userdata($userId)->roles) && !empty(get_userdata($userId)->roles)) {
-                        continue;
-                    }
-                    add_user_to_blog(get_current_blog_id(), $userId, $this->defaultRole);
-                    restore_current_blog();
+                    add_user_to_blog($site->blog_id, $userId, $this->defaultRole);
                 }
             } else {
-                if (isset(get_userdata($userId)->roles) && !empty(get_userdata($userId)->roles)) {
-                    return;
-                }
                 add_user_to_blog(get_current_blog_id(), $userId, $this->defaultRole);
             }
         } else {
@@ -380,7 +356,7 @@ class BulkImport
             'password' => AD_BULK_IMPORT_PASSWORD
         );
 
-        //Fetch index
+        //Fetch user profiles
         $userDataArray = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/get/' . implode("/", $userNames) ."/", $data, 'json', array('Content-Type: application/json'));
 
         //Validate json response
