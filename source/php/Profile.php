@@ -36,18 +36,18 @@ class Profile
             $fields['user_email'] = strtolower($data->mail);
         }
 
-        //Update fields
-        if(count($fields) != 1) {
-            wp_update_user($fields);
-        }
-
         //Update password
         if($updatePassword === true) {
             if (!AD_RANDOM_PASSWORD && AD_SAVE_PASSWORD && isset($_POST['pwd']) && !empty($_POST['pwd'])) {
-                wp_set_password($_POST['pwd'], $user_id);
+                $fields['user_pass'] = $_POST['pwd'];
             } elseif (AD_RANDOM_PASSWORD) {
-                wp_set_password(wp_generate_password(), $user_id);
+                $fields['user_pass'] = wp_generate_password();
             }
+        }
+
+        //Update fields
+        if(count($fields) != 1) {
+            wp_update_user($fields);
         }
 
         //Update meta
