@@ -170,7 +170,7 @@ class BulkImport
             return $this->localAccountCache;
         }
 
-        return $this->localAccountCache = array_map('strtolower', $this->db->get_col("SELECT user_login FROM " . $this->db->users));
+        return $this->localAccountCache = array_map('strtolower', $this->db->get_col("SELECT user_login FROM " . $this->db->users . " ORDER BY RAND()"));
     }
 
     /**
