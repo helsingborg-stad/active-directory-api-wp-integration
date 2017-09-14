@@ -250,9 +250,9 @@ class BulkImport
     public function createFakeEmail($userName)
     {
         if (defined('AD_USER_DOMAIN')) {
-            return "temp." . base_convert($userName . time(), 10, 32) . "@" . AD_USER_DOMAIN;
+            return $userName . "@" . AD_USER_DOMAIN;
         } else {
-            return "temp." . base_convert($userName . time(), 10, 32) . "@" . base_convert($userName . time(), 10, 32) . ".dev";
+            return $userName . "@" . base_convert($userName . time(), 10, 32) . ".dev";
         }
     }
 

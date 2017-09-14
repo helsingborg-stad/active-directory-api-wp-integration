@@ -32,7 +32,7 @@ class Profile
         }
 
         //Update email
-        if (AD_UPDATE_EMAIL && isset($data->mail) && is_email($data->mail)) {
+        if (isset($data->mail) && is_email($data->mail) && AD_UPDATE_EMAIL) {
             $fields['user_email'] = strtolower($data->mail);
         }
 
