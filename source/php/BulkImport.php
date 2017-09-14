@@ -127,7 +127,9 @@ class BulkImport
                         if (is_array($userAccounts) && !empty($userAccounts)) {
                             foreach ((array) $userAccounts as $userName) {
                                 if ($userId = $this->userNameExists($userName)) {
-                                    add_user_to_blog($site->blog_id, $userId, $this->defaultRole);
+                                    if (!is_user_member_of_blog($userId, $site->blog_id)) {
+                                        add_user_to_blog($site->blog_id, $userId, $this->defaultRole);
+                                    }
                                 }
                             }
                         }
