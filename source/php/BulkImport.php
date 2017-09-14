@@ -79,7 +79,7 @@ class BulkImport
         }, 5);
 
         //Manually test update profiles cron
-        add_action('admin_init', function(){
+        add_action('admin_init', function () {
             if (isset($_GET['adbulkprofile'])) {
                 define('DOING_CRON', true);
 
@@ -98,6 +98,17 @@ class BulkImport
             }
         }, 5);
 
+        //Manually propagate all users
+        add_action('admin_init', function () {
+            if (isset($_GET['adbulkpropagate']) && AD_BULK_IMPORT_PROPAGATE) {
+                $sites = get_sites();
+                if ($sites && !empty($sites)) {
+                    foreach ($sites as $site) {
+                        add_user_to_blog($site->blog_id, $userId, $this->defaultRole);
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -129,7 +140,7 @@ class BulkImport
         //Step 3: Create these accounts
         if (is_array($createAccounts) && !empty($createAccounts)) {
             foreach ((array) $createAccounts as $accountName) {
-                if(!in_array($accountName, $deleteAccounts)) {
+                if (!in_array($accountName, $deleteAccounts)) {
                     $this->createAccount($accountName);
                 }
             }
@@ -232,7 +243,6 @@ class BulkImport
 
         foreach ($userNames as $userName) {
             if (!in_array($userName, $this->getLocalAccounts())) {
-
                 $userId =  wp_create_user($userName, wp_generate_password(), $this->createFakeEmail($userName));
 
                 if (is_numeric($userId)) {
@@ -311,7 +321,6 @@ class BulkImport
 
     public function reassignToUserId()
     {
-
         if (!is_null($this->reassignToUserIdCache)) {
             return $this->reassignToUserIdCache;
         }
@@ -407,7 +416,8 @@ class BulkImport
      * @return numeric/bool Returns the user id found, otherwise false. Does not use usename_exists due to the creation of WpObject on each call.
      */
 
-    public function userNameExists($username) {
+    public function userNameExists($username)
+    {
         $user = $this->db->get_col(
                     $this->db->prepare("SELECT ID FROM " . $this->db->users . " WHERE user_login = %s LIMIT 1", $username)
                 );
@@ -416,5 +426,4 @@ class BulkImport
         }
         return false;
     }
-
 }
