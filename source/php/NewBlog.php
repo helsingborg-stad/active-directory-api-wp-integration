@@ -46,4 +46,33 @@ class NewBlog
             $this->addDefaultRole($user->ID, $blogId);
         }
     }
+
+    /**
+     * Adds the specified userid to a specified or all blogs
+     * @param integer $userId User id to add
+     * @param integer $blogId Specific blog_id (leave null for all)
+     */
+    public function addDefaultRole($userId, $blogId = null)
+    {
+        // Single
+        if ($blogId) {
+            if (is_user_member_of_blog($userId, $blogId)) {
+                return false;
+            }
+
+            add_user_to_blog($blogId, $userId, $this->defaultRole);
+            return true;
+        }
+
+        // Multiple
+        foreach (get_sites() as $site) {
+            if (is_user_member_of_blog($userId, $site->blog_id)) {
+                continue;
+            }
+
+            add_user_to_blog($site->blog_id, $userId, $this->defaultRole);
+        }
+
+        return true;
+    }
 }
