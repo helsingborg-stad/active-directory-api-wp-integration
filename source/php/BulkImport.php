@@ -120,8 +120,17 @@ class BulkImport
 
                 $sites = get_sites();
                 if ($sites && !empty($sites)) {
+
+                    $userAccounts = $this->getLocalAccounts();
+
                     foreach ($sites as $site) {
-                        add_user_to_blog($site->blog_id, $userId, $this->defaultRole);
+                        if (is_array($userAccounts) && !empty($userAccounts)) {
+                            foreach ((array) $userAccounts as $userName) {
+                                if ($userId = $this->userNameExists($userName)) {
+                                    add_user_to_blog($site->blog_id, $userId, $this->defaultRole);
+                                }
+                            }
+                        }
                     }
                 }
                 echo "Manually propagated the users.";
