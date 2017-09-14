@@ -65,15 +65,22 @@ class BulkImport
         add_action('ad_integration_bulk_update_profiles', array($this, 'updateProfiles'));
 
         /**
-         * The following code in constructor is manual tests of functionality.
+         * The following code in constructor is manual tests/actions of functionality.
          */
 
         //Manually test functionality
         add_action('admin_init', function () {
             if (isset($_GET['adbulkimport'])) {
+
+                //Define as cron
                 define('DOING_CRON', true);
+
+                //Increase memory and runtime
+                ini_set('memory_limit', "512M");
+                ini_set('max_execution_time', 60*60*60);
+
                 $this->cron();
-                $this->scheduleUpdateProfiles();
+                echo "Manually sycked the users";
                 exit;
             }
         }, 5);
@@ -81,6 +88,7 @@ class BulkImport
         //Manually test update profiles cron
         add_action('admin_init', function () {
             if (isset($_GET['adbulkprofile'])) {
+
                 define('DOING_CRON', true);
 
                 //Increase memory and runtime
@@ -94,6 +102,7 @@ class BulkImport
                         $this->updateProfiles($userChunk);
                     }
                 }
+                echo "Manually bulk updated user profiles.";
                 exit;
             }
         }, 5);
@@ -101,12 +110,22 @@ class BulkImport
         //Manually propagate all users
         add_action('admin_init', function () {
             if (isset($_GET['adbulkpropagate']) && AD_BULK_IMPORT_PROPAGATE) {
+
+                //Define as cron
+                define('DOING_CRON', true);
+
+                //Increase memory and runtime
+                ini_set('memory_limit', "512M");
+                ini_set('max_execution_time', 60*60*60);
+
                 $sites = get_sites();
                 if ($sites && !empty($sites)) {
                     foreach ($sites as $site) {
                         add_user_to_blog($site->blog_id, $userId, $this->defaultRole);
                     }
                 }
+                echo "Manually propagated the users.";
+                exit;
             }
         });
     }
