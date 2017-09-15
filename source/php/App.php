@@ -226,6 +226,12 @@ class App
     private function signOn()
     {
         wp_set_auth_cookie($this->userId, true);
+
+        $user = new WP_User($this->userId);
+
+        if (!is_wp_error($user)) {
+            do_action('wp_login', $user->user_login, $user);
+        }
     }
 
     /**
