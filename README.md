@@ -39,6 +39,14 @@ add_filter('adApiWpIntegration/profile/metaKey', function($meta_key){
 }); 
 ```
 
+Filter the default redirect to page, subscribers may not beaffected to this (to homepage as default)
+```php
+add_filter('adApiWpIntegration/login/defaultRedirect', function(){
+    return home_url();
+}); 
+```
+
+
 # Example configuration 
 ```php
  define('AD_INTEGRATION_URL', 'https://internalproductionserver.com/ad-api/');
