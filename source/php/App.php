@@ -141,7 +141,7 @@ class App
                     exit;
                 }
 
-                wp_redirect(admin_url("?auth=active-directory"));
+                wp_redirect(apply_filters('adApiWpIntegration/login/defaultRedirect', admin_url("?auth=active-directory")));
                 exit;
             }
         }
