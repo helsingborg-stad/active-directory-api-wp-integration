@@ -41,7 +41,8 @@ class App
      * @return void
      */
 
-    public function disabledNotificationEmails() {
+    public function disabledNotificationEmails()
+    {
         add_filter('send_password_change_email', '__return_false');
         add_filter('send_email_change_email', '__return_false');
     }
@@ -130,7 +131,16 @@ class App
                 //Signon
                 $this->signOn();
 
-                //Redirect to admin panel
+                //Redirect to admin panel / frontpage
+                if (in_array('subscriber', (array) $user->roles)) {
+                    if (is_multisite()) {
+                        wp_redirect(network_home_url('/'));
+                        exit;
+                    }
+                    wp_redirect(home_url('/'));
+                    exit;
+                }
+
                 wp_redirect(admin_url("?auth=active-directory"));
                 exit;
             }
