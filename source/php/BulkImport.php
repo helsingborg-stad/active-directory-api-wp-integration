@@ -88,7 +88,6 @@ class BulkImport
         //Manually test update profiles cron
         add_action('admin_init', function () {
             if (isset($_GET['adbulkprofile'])) {
-
                 define('DOING_CRON', true);
 
                 //Increase memory and runtime
@@ -120,7 +119,6 @@ class BulkImport
 
                 $sites = get_sites();
                 if ($sites && !empty($sites)) {
-
                     $userAccounts = $this->getLocalAccounts();
 
                     foreach ($sites as $site) {
