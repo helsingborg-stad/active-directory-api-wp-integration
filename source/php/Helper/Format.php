@@ -27,14 +27,14 @@ class Format
         $response = array();
 
         if (isset($data->sn) && !empty($data->sn)) {
-            $response['firstname'] = trim(str_replace($data->sn, "", substr($string, 0, mb_strpos($string, " - "))));
+            $response['firstname'] = trim(str_replace($data->sn, "", substr($string, 0, strpos($string, " - "))));
             $response['lastname'] = $data->sn;
-        } elseif (isset($data->mail) && mb_strpos($data->mail, ".")) {
-            $response['firstname'] = trim(substr($data->mail, 0, mb_strpos($data->mail, ".")));
-            $response['lastname'] = trim(substr($data->mail, mb_strpos($data->mail, ".")+1, mb_strpos($data->mail, "@")-mb_strpos($data->mail, ".")-1));
+        } elseif (isset($data->mail) && strpos($data->mail, ".")) {
+            $response['firstname'] = trim(substr($data->mail, 0, strpos($data->mail, ".")));
+            $response['lastname'] = trim(substr($data->mail, strpos($data->mail, ".")+1, strpos($data->mail, "@")-strpos($data->mail, ".")-1));
         } else {
             $tempData = array();
-            $tempData = trim(substr($string, 0, mb_strpos($string, " - ")));
+            $tempData = trim(substr($string, 0, strpos($string, " - ")));
 
             if (!empty($tempData)) {
 
@@ -49,8 +49,8 @@ class Format
         }
 
         //Uppercase first letters
-        $response['firstname'] = ucfirst(preg_replace('/[0-9]+/', '', $response['firstname']));
-        $response['lastname'] = ucfirst(preg_replace('/[0-9]+/', '', $response['lastname']));
+        $response['firstname'] = ucfirst($response['firstname']);
+        $response['lastname'] = ucfirst($response['lastname']);
 
         return $response;
     }
