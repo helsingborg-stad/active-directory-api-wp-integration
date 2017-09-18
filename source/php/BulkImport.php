@@ -80,7 +80,7 @@ class BulkImport
                 ini_set('max_execution_time', 60*60*60);
 
                 $this->cron();
-                echo "Manually sycked the users";
+                echo "Manually synced the users";
                 exit;
             }
         }, 5);
@@ -138,7 +138,7 @@ class BulkImport
                 echo "Manually propagated the users.";
                 exit;
             }
-        });
+        }, 5);
     }
 
     /**
