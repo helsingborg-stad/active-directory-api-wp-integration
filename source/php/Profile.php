@@ -9,7 +9,7 @@ class Profile
 
     public function __construct()
     {
-        if(is_null($this->format)) {
+        if (is_null($this->format)) {
             $this->format = new Helper\Format();
         }
     }
@@ -26,9 +26,11 @@ class Profile
 
         //Update name
         if (AD_UPDATE_NAME && isset($data->displayname) && !empty($data->displayname)) {
-            $name = $this->format::parseDisplayName($data->displayname);
+            $name = $this->format::parseDisplayName($data->displayname, $data);
+
             $fields['first_name'] = $name['firstname'];
             $fields['last_name'] = $name['lastname'];
+            $fields['display_name'] = $name['firstname'] . " " . $name['lastname'];
         }
 
         //Update email
@@ -37,7 +39,7 @@ class Profile
         }
 
         //Update password
-        if($updatePassword === true) {
+        if ($updatePassword === true) {
             if (!AD_RANDOM_PASSWORD && AD_SAVE_PASSWORD && isset($_POST['pwd']) && !empty($_POST['pwd'])) {
                 $fields['user_pass'] = $_POST['pwd'];
             } elseif (AD_RANDOM_PASSWORD) {
@@ -46,7 +48,7 @@ class Profile
         }
 
         //Update fields
-        if(count($fields) != 1) {
+        if (count($fields) != 1) {
             wp_update_user($fields);
         }
 
@@ -61,6 +63,5 @@ class Profile
 
         //Last updated by ad timestamp
         update_user_meta($user_id, AD_META_PREFIX . apply_filters('adApiWpIntegration/profile/metaKey', "last_sync"), date("Y-m-d H:i:s"));
-
     }
 }
