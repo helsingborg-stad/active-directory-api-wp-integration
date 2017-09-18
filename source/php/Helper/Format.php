@@ -49,8 +49,8 @@ class Format
         }
 
         //Uppercase first letters
-        $response['firstname'] = ucfirst($response['firstname']);
-        $response['lastname'] = ucfirst($response['lastname']);
+        $response['firstname'] = ucfirst(preg_replace('/[0-9]+/', '', $response['firstname']));
+        $response['lastname'] = ucfirst(preg_replace('/[0-9]+/', '', $response['lastname']));
 
         return $response;
     }
