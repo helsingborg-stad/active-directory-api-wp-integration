@@ -161,6 +161,7 @@ class BulkImport
         //Sanity check, many users to remove?
         $maxDeleteLimit = (int) isset($_GET['maxDeletelimit']) ? $_GET['maxDeletelimit'] : 20;
         if ($deleteAccounts > $maxDeleteLimit) {
+            error_log("Ad integration: To many user deletions in queue (" . $maxDeleteLimit . ").");
             die("ERROR: To many user deletions in queue (" . $maxDeleteLimit . ") add &maxDeleteLimit=number to your query to allow number of required deletions.");
         }
 
@@ -241,7 +242,8 @@ class BulkImport
 
         //Check that no errors occured
         if (json_last_error() == JSON_ERROR_NONE) {
-            die("Could not read JSON.");
+            error_log("Ad integration: Could not read index due to the fact that the response wasen't a valid json string.");
+            exit;
         }
 
         //Return
