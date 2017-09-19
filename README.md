@@ -9,7 +9,9 @@ Integration with the simple active directory api service (https://github.com/hel
 # Trigger manual bulkimport
 You can trigger a manual bulkimport. This will directly call the bulkimport function in your current call. Profile updates will be sheduled every minute following, until all WordPress users has been updated. 
 
-Simply call: https://site.dev/wp-admin/?adbulkimport
+Import new users / remove old: https://site.dev/wp-admin/?adbulkimport
+Update registered profiles: https://site.dev/wp-admin/?adbulkprofile
+Propagate user roles to all sites: https://site.dev/wp-admin/?adbulkpropagate
 
 # Options (Define Constants)
 - AD_UPDATE_NAME: Update first and last name. 
