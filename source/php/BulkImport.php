@@ -76,7 +76,7 @@ class BulkImport
                 define('DOING_CRON', true);
 
                 //Increase memory and runtime
-                ini_set('memory_limit', "512M");
+                ini_set('memory_limit', "2048M");
                 ini_set('max_execution_time', 60*60*60);
 
                 $this->cron();
@@ -91,7 +91,7 @@ class BulkImport
                 define('DOING_CRON', true);
 
                 //Increase memory and runtime
-                ini_set('memory_limit', "512M");
+                ini_set('memory_limit', "2048M");
                 ini_set('max_execution_time', 60*60*60);
 
                 $userAccounts = $this->getLocalAccounts();
@@ -114,8 +114,11 @@ class BulkImport
                 define('DOING_CRON', true);
 
                 //Increase memory and runtime
-                ini_set('memory_limit', "512M");
+                ini_set('memory_limit', "2048M");
                 ini_set('max_execution_time', 60*60*60);
+
+                //Include required resources
+                require_once(ABSPATH . 'wp-admin/includes/user.php');
 
                 $sites = get_sites();
                 if ($sites && !empty($sites)) {
