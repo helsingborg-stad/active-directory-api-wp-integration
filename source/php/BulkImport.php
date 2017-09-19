@@ -235,8 +235,13 @@ class BulkImport
         $index = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/index', $data, 'json', array('Content-Type: application/json'));
 
         //Validate json response
-        if ($this->response::isJsonError($index)) {
+        if ($this->response::isJsonError($index)||!json_decode($index)) {
             return false;
+        }
+
+        //Check that no errors occured
+        if (json_last_error() == JSON_ERROR_NONE) {
+            die("Could not read JSON.");
         }
 
         //Return
