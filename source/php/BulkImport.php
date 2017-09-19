@@ -158,6 +158,12 @@ class BulkImport
         $createAccounts = $this->diffUserAccounts(true);
         $deleteAccounts = $this->diffUserAccounts(false);
 
+        //Sanity check, many users to remove?
+        $maxDeleteLimit = (int) isset($_GET['maxDeletelimit']) ? $_GET['maxDeletelimit'] : 20;
+        if ($deleteAccounts > $maxDeleteLimit) {
+            die("ERROR: To many user deletions in queue (" . $maxDeleteLimit . ") add &maxDeleteLimit=number to your query to allow number of required deletions.");
+        }
+
         //Step 2: Delete these accounts
         if (is_array($deleteAccounts) && !empty($deleteAccounts)) {
             foreach ((array) $deleteAccounts as $accountName) {
