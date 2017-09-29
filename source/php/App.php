@@ -85,6 +85,11 @@ class App
             define('AD_RANDOM_PASSWORD', true);
         }
 
+        // Bulk import off by default
+        if (!defined('AD_BULK_IMPORT')) {
+            define('AD_BULK_IMPORT', false);
+        }
+
         // Bulk import default role
         if (!defined('AD_BULK_IMPORT_ROLE')) {
             define('AD_BULK_IMPORT_ROLE', "subscriber");
