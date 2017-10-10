@@ -196,7 +196,7 @@ class BulkImport
     private function bulkEnabled()
     {
         //Check if bulk should be done
-        if (!(defined('AD_BULK_IMPORT') || AD_BULK_IMPORT !== true)) {
+        if (!(defined('AD_BULK_IMPORT') || (defined('AD_BULK_IMPORT') && AD_BULK_IMPORT !== true))) {
             return false;
         }
 
