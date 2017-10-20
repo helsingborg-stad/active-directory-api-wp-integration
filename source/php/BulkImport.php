@@ -164,14 +164,13 @@ class BulkImport
         //Sanity check, many users to remove?
         $maxDeleteLimit = (int) isset($_GET['maxDeletelimit']) ? $_GET['maxDeletelimit'] : 20;
         if (count($deleteAccounts) > $maxDeleteLimit) {
-            error_log("Ad integration: To many user deletions in queue (" . $maxDeleteLimit . ").");
-            die("ERROR: To many user deletions in queue (" . $maxDeleteLimit . ") add &maxDeleteLimit=number to your query to allow number of required deletions.");
-        }
-
-        //Step 2: Delete these accounts
-        if (is_array($deleteAccounts) && !empty($deleteAccounts)) {
-            foreach ((array) $deleteAccounts as $accountName) {
-                $this->deleteAccount($accountName);
+            wp_mail(get_option('admin_email'), "Ad-integration plugin", "To many user deletions in queue (" . $maxDeleteLimit . ") add &maxDeleteLimit=number to your query to allow number of required deletions.");
+        } else {
+            //Step 2: Delete these accounts
+            if (is_array($deleteAccounts) && !empty($deleteAccounts)) {
+                foreach ((array) $deleteAccounts as $accountName) {
+                    $this->deleteAccount($accountName);
+                }
             }
         }
 
