@@ -32,8 +32,12 @@ class Login
      * Check the nonce before running login procedure, must use a hook lower than 20 (ad hijack).
      * @return void / bool
      */
-    public function validateNonce()
+    public function validateNonce($username)
     {
+        if (empty($username)) {
+            return false;
+        }
+
         if (!AD_VALIDATE_NONCE) {
             return false;
         }
@@ -42,7 +46,7 @@ class Login
             return true;
         }
 
-        wp_die("Could not verify that you are a person.", 'adintegration');
+        wp_die(__("Could not verify that you are a person.", 'adintegration'));
     }
 
     /**

@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Active Directory Integration\n"
-"POT-Creation-Date: 2018-01-02 08:22+0100\n"
-"PO-Revision-Date: 2018-01-02 08:24+0100\n"
+"POT-Creation-Date: 2018-01-02 08:38+0100\n"
+"PO-Revision-Date: 2018-01-02 08:39+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: sv_SE\n"
@@ -55,6 +55,10 @@ msgstr ""
 #: source/php/BulkImport.php:172
 msgid "To many user deletions in queue ("
 msgstr "På grund av för många avregistreringar är användarborrtagningen låst ("
+
+#: source/php/Login.php:49
+msgid "Could not verify that you are a person."
+msgstr "Kunde inte verifiera att inloggningen är utförd av en riktig människa."
 
 #. Plugin Name of the plugin/theme
 msgid "Active Directory Integration"
