@@ -49,7 +49,6 @@ class Login
      * Creates a date specific nonce
      * @return string
      */
-
     public function createNonceKey()
     {
         return md5("adnoncekey" . date("Y-m-d"));
