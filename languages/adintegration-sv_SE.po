@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Active Directory Integration\n"
-"POT-Creation-Date: 2017-04-10 15:40+0200\n"
-"PO-Revision-Date: 2017-04-10 15:40+0200\n"
+"POT-Creation-Date: 2018-01-02 08:22+0100\n"
+"PO-Revision-Date: 2018-01-02 08:24+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: sv_SE\n"
@@ -20,13 +20,13 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
-#: source/php/Admin.php:14
+#: source/php/Admin.php:23
 msgid "Please add AD_INTEGRATION_URL to this sites configuration file(s)."
 msgstr ""
 "Vänligen lägg till konstanten AD_INTEGRATION_URL till den här webbplatsens "
 "konfigurationsfiler. "
 
-#: source/php/Admin.php:19
+#: source/php/Admin.php:28
 msgid ""
 "The AD_INTEGRATION_URL provided is not a properly formatted url (should be "
 "with https:// and pointing at the base directory of the api)."
@@ -34,6 +34,27 @@ msgstr ""
 "Konstanten AD_INTEGRATION_URL som du har angett är inte en giltig "
 "webbadress. Adressen ska börja med https:// och peka på rootkatalogen av api-"
 "tjänsten."
+
+#: source/php/Admin.php:33
+msgid ""
+"The AD_RANDOM_PASSWORD and AD_SAVE_PASSWORD constants cannot be true at the "
+"same time."
+msgstr ""
+"Nycklarna AD_RANDOM_PASSWORD och AD_SAVE_PASSWORD kan inte vara ”true” "
+"samtidigt. "
+
+#: source/php/Admin.php:38
+msgid ""
+"The AD_BULK_IMPORT is defined but AD_BULK_IMPORT_USER and/or "
+"AD_BULK_IMPORT_PASSWORD is not. This is required to enable bulkimport."
+msgstr ""
+"Konstanten AD_BULK_IMPORT är definierad men AD_BULK_IMPORT_USER och/eller "
+"AD_BULK_IMPORT_PASSWORD är inte definierad. Det här är obligatoriskt för att "
+"aktivera bulkimporten."
+
+#: source/php/BulkImport.php:172
+msgid "To many user deletions in queue ("
+msgstr "På grund av för många avregistreringar är användarborrtagningen låst ("
 
 #. Plugin Name of the plugin/theme
 msgid "Active Directory Integration"
