@@ -99,6 +99,11 @@ class App
         if (!defined('AD_BULK_IMPORT_PROPAGATE')) {
             define('AD_BULK_IMPORT_PROPAGATE', true);
         }
+
+        //Use nonce validation (login form)
+        if (!defined('AD_VALIDATE_NONCE')) {
+            define('AD_VALIDATE_NONCE', true);
+        }
     }
 
     /**
@@ -107,7 +112,6 @@ class App
      */
     public function hijackLogin($username)
     {
-
         //Translate email login to username
         if (is_email($username)) {
             $username = $this->emailToUsername($username);
