@@ -80,17 +80,17 @@ class App
             define('AD_SAVE_PASSWORD', false);
         }
 
-        // Create a random passowrd
+        //Create a random passowrd
         if (!defined('AD_RANDOM_PASSWORD')) {
             define('AD_RANDOM_PASSWORD', true);
         }
 
-        // Bulk import off by default
+        //Bulk import off by default
         if (!defined('AD_BULK_IMPORT')) {
             define('AD_BULK_IMPORT', false);
         }
 
-        // Bulk import default role
+        //Bulk import default role
         if (!defined('AD_BULK_IMPORT_ROLE')) {
             define('AD_BULK_IMPORT_ROLE', "subscriber");
         }
@@ -103,6 +103,11 @@ class App
         //Use nonce validation (login form)
         if (!defined('AD_VALIDATE_NONCE')) {
             define('AD_VALIDATE_NONCE', true);
+        }
+
+        //Activate cleaning actions
+        if (!defined('AD_CLEANING')) {
+            define('AD_CLEANING', true);
         }
     }
 

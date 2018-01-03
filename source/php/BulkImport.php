@@ -295,7 +295,6 @@ class BulkImport
         }
 
         foreach ($userNames as $userName) {
-
             if (empty($userName)) {
                 continue;
             }
