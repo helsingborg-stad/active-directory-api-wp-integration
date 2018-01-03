@@ -15,6 +15,12 @@ class Cleaning
     public function __construct()
     {
 
+        //Globals
+        global $wpdb;
+
+        //Init
+        $this->db = $wpdb;
+
         //Manual actions (tests)
         $this->manualActions();
 
@@ -22,12 +28,6 @@ class Cleaning
         if ($this->cleaningEnabled() === false) {
             return;
         }
-
-        //Globals
-        global $wpdb;
-
-        //Init
-        $this->db = $wpdb;
 
         //Init crons
         $this->initCronJobs();
@@ -98,7 +98,7 @@ class Cleaning
 
     public function removeDuplicateUsers()
     {
-        $this->db->qyery("DELETE FROM " . $this->db->users . "
+        $this->db->query("DELETE FROM " . $this->db->users . "
         WHERE id NOT IN (
             SELECT *
             FROM (
@@ -115,7 +115,7 @@ class Cleaning
      */
     public function removeOphanUserMeta()
     {
-        $this->db->qyery("DELETE FROM " . $this->db->usermeta . "
+        $this->db->query("DELETE FROM " . $this->db->usermeta . "
         WHERE NOT EXISTS (
           SELECT * FROM " . $this->db->users . "
             WHERE " . $this->db->usermeta . ".user_id = " . $this->db->users . ".ID
@@ -128,7 +128,7 @@ class Cleaning
      */
     public function removeEmptyCapabilities()
     {
-        $this->db->qyery("DELETE FROM " . $this->db->usermeta . " WHERE meta_key LIKE '%" . $this->db->base_prefix . "_%capabilities%' AND meta_value = 'a:0:{}'");
+        $this->db->query("DELETE FROM " . $this->db->usermeta . " WHERE meta_key LIKE '%" . $this->db->base_prefix . "_%capabilities%' AND meta_value = 'a:0:{}'");
     }
 
     /**
