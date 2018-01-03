@@ -295,7 +295,12 @@ class BulkImport
         }
 
         foreach ($userNames as $userName) {
-            if (!empty($userName) && !in_array($userName, $this->getLocalAccounts())) {
+
+            if (empty($userName)) {
+                continue;
+            }
+
+            if (!in_array($userName, $this->getLocalAccounts())) {
 
                 //Do a sanity check
                 if ($this->userNameExists($userName)) {
