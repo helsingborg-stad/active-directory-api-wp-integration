@@ -25,7 +25,7 @@ class Login
             return false;
         }
 
-        wp_nonce_field($this->createNonceKey(), $name = '_ad_nonce', true, true);
+        wp_nonce_field($this->createNonceKey(), '_ad_nonce', true, true);
     }
 
     /**
