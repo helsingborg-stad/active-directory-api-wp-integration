@@ -409,7 +409,7 @@ class BulkImport
     }
 
     /**
-     * Creates a schedule of 100 update profiles in bulk
+     * Creates a schedule of 200 update profiles in bulk
      * @return void
      */
 
