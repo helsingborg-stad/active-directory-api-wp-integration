@@ -13,6 +13,13 @@ Import new users / remove old: https://site.dev/wp-admin/?adbulkimport
 Update registered profiles: https://site.dev/wp-admin/?adbulkprofile
 Propagate user roles to all sites: https://site.dev/wp-admin/?adbulkpropagate
 
+# Trigger manual cleaning actions 
+Cleaning actions to keep WordPress tables clean in some installations that are using bad object cache-engines.
+
+Remove duplicate users: https://site.dev/wp-admin/?adcleanusers
+Remove orphan user meta: https://site.dev/wp-admin/?adcleanmeta
+Remove user capabilitys that are empty: https://site.dev/wp-admin/?adcleancap
+
 # Options (Define Constants)
 - AD_UPDATE_NAME: Update first and last name. 
 - AD_UPDATE_EMAIL: Update email if it not belongs to another user account. 
