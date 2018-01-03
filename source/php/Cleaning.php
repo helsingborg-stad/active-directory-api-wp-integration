@@ -15,6 +15,9 @@ class Cleaning
     public function __construct()
     {
 
+        //Manual actions (tests)
+        $this->manualActions();
+
         //Check if is runable
         if ($this->cleaningEnabled() === false) {
             return;
@@ -35,9 +38,36 @@ class Cleaning
         add_action('ad_integration_cleaning_capabilities', array($this, 'removeEmptyCapabilities'));
     }
 
+    /**
+     * Schedule crons
+     * @return void
+     */
+    public function manualActions()
+    {
+        add_action('admin_init', function () {
+            if (isset($_GET['adcleanusers'])) {
+                $this->removeDuplicateUsers();
+                wp_die("Removed duplicate users.");
+            }
+
+            if (isset($_GET['adcleanmeta'])) {
+                $this->removeOphanUserMeta();
+                wp_die("Removed orphan meta.");
+            }
+
+            if (isset($_GET['adcleancap'])) {
+                $this->removeEmptyCapabilities();
+                wp_die("Removed empty capabilities.");
+            }
+        });
+    }
+
+    /**
+     * Schedule crons
+     * @return void
+     */
     public function initCronJobs()
     {
-
         //Create duplciate users cron
         add_action('init', function () {
             if (!wp_next_scheduled('ad_integration_cleaning_duplicate_users')) {
@@ -48,14 +78,14 @@ class Cleaning
         //Create orphan meta cron
         add_action('init', function () {
             if (!wp_next_scheduled('ad_integration_cleaning_orphan_meta')) {
-                wp_schedule_event((strtotime("midnight") + (60*60*4)), 'daily', 'ad_integration_cleaning_orphan_meta');
+                wp_schedule_event((strtotime("midnight") + (60*60*5)), 'daily', 'ad_integration_cleaning_orphan_meta');
             }
         });
 
         //Create empty cap cron
         add_action('init', function () {
             if (!wp_next_scheduled('ad_integration_cleaning_capabilities')) {
-                wp_schedule_event((strtotime("midnight") + (60*60*4)), 'daily', 'ad_integration_cleaning_capabilities');
+                wp_schedule_event((strtotime("midnight") + (60*60*6)), 'daily', 'ad_integration_cleaning_capabilities');
             }
         });
     }

@@ -40,4 +40,4 @@ new adApiWpIntegration\Password(); //Do not allow ad-users to change their passw
 new adApiWpIntegration\Admin(); // Sends admin panel errors & information
 new adApiWpIntegration\BulkImport(); // Import user accounts in bulk
 new adApiWpIntegration\NewBlog(); // Propagate users if new blog is created
-
+new adApiWpIntegration\Cleaning(); // Cleaning actions
