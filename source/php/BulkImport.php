@@ -296,7 +296,13 @@ class BulkImport
 
         foreach ($userNames as $userName) {
             if (!empty($userName) && !in_array($userName, $this->getLocalAccounts())) {
-                $userId =  wp_create_user($userName, wp_generate_password(), $this->createFakeEmail($userName));
+
+                //Do a sanity check
+                if (username_exists($userName)) {
+                    $userId =  wp_create_user($userName, wp_generate_password(), $this->createFakeEmail($userName));
+                } else {
+                    $userId = null;
+                }
 
                 if (is_numeric($userId)) {
                     $this->setUserRole($userId);
