@@ -147,11 +147,20 @@ class App
 
                 //Redirect to admin panel / frontpage
                 if (in_array('subscriber', (array) $user->roles)) {
+
+                    //Get bulitin referer
+                    if (isset($_POST['_wp_http_referer'])) {
+                        $referer = $_POST['_wp_http_referer'];
+                    } else {
+                        $referer = "/";
+                    }
+
+                    //Redirect to correct url
                     if (is_multisite()) {
-                        wp_redirect(apply_filters('adApiWpIntegration/login/subscriberRedirect', network_home_url('/')));
+                        wp_redirect(apply_filters('adApiWpIntegration/login/subscriberRedirect', network_home_url($referer)));
                         exit;
                     }
-                    wp_redirect(apply_filters('adApiWpIntegration/login/subscriberRedirect', home_url('/')));
+                    wp_redirect(apply_filters('adApiWpIntegration/login/subscriberRedirect', home_url($referer)));
                     exit;
                 }
 
