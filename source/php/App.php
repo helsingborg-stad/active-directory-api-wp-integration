@@ -146,7 +146,7 @@ class App
                 $this->signOn();
 
                 //Redirect to admin panel / frontpage
-                if (in_array('subscriber', (array) $user->roles)) {
+                if (in_array('subscriber', (array) get_userdata($this->userId)->roles)) {
 
                     //Get bulitin referer
                     if (isset($_POST['_wp_http_referer'])) {
@@ -154,9 +154,6 @@ class App
                     } else {
                         $referer = "/";
                     }
-
-                    //Parse away qs
-                    $referer = $this->removeQuerystrings($referer);
 
                     //Redirect to correct url
                     if (is_multisite()) {
@@ -173,23 +170,6 @@ class App
         }
     }
 
-    /**
-     * Remove querystring
-     * @param  $url a url or path
-     * @return string
-     */
-
-    private function removeQuerystrings($url)
-    {
-        if ($url = parse_url($url)) {
-            if (isset($url['scheme']) && isset($url['host']) && isset($url['path'])) {
-                return $url['scheme'] . $url['host'] . $url['path'];
-            } elseif (isset($url['path'])) {
-                return $url['path'];
-            }
-            return "";
-        }
-    }
 
     /**
      * Get information from the api-service
