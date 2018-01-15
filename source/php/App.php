@@ -148,10 +148,10 @@ class App
                 //Redirect to admin panel / frontpage
                 if (in_array('subscriber', (array) $user->roles)) {
                     if (is_multisite()) {
-                        wp_redirect(network_home_url('/'));
+                        wp_redirect(apply_filters('adApiWpIntegration/login/subscriberRedirect', network_home_url('/')));
                         exit;
                     }
-                    wp_redirect(home_url('/'));
+                    wp_redirect(apply_filters('adApiWpIntegration/login/subscriberRedirect', home_url('/')));
                     exit;
                 }
 
