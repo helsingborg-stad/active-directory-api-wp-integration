@@ -42,6 +42,10 @@ class Login
             return false;
         }
 
+        if (!isset($_POST['_ad_nonce'])) {
+            return false;
+        }
+
         if (wp_verify_nonce($_POST['_ad_nonce'], $this->createNonceKey())) {
             return true;
         }
