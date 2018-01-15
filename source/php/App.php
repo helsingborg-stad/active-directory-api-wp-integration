@@ -155,6 +155,9 @@ class App
                         $referer = "/";
                     }
 
+                    //Parse away qs
+                    $referer = $this->removeQuerystrings($referer);
+
                     //Redirect to correct url
                     if (is_multisite()) {
                         wp_redirect(apply_filters('adApiWpIntegration/login/subscriberRedirect', network_home_url($referer)));
@@ -170,6 +173,23 @@ class App
         }
     }
 
+    /**
+     * Remove querystring
+     * @param  $url a url or path
+     * @return string
+     */
+
+    private function removeQuerystrings($url)
+    {
+        if ($url = parse_url($url)) {
+            if (isset($url['scheme']) && isset($url['host']) && isset($url['path'])) {
+                return $url['scheme'] . $url['host'] . $url['path'];
+            } elseif (isset($url['path'])) {
+                return $url['path'];
+            }
+            return "";
+        }
+    }
 
     /**
      * Get information from the api-service
