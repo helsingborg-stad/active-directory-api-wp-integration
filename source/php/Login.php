@@ -30,12 +30,12 @@ class Login
      */
     public function validateNonce($username)
     {
-
-        if (isset($_POST['_ad_nonce']) && wp_verify_nonce($_POST['_ad_nonce'], $this->createNonceKey())) {
-            return true;
+        if (isset($_POST) && is_array($_POST) && !empty($_POST)) {
+            if (isset($_POST['_ad_nonce']) && wp_verify_nonce($_POST['_ad_nonce'], $this->createNonceKey())) {
+                return true;
+            }
+            wp_die(__("Could not verify that you are a person.", 'adintegration'));
         }
-
-        wp_die(__("Could not verify that you are a person.", 'adintegration'));
     }
 
     /**
