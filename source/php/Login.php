@@ -21,10 +21,6 @@ class Login
      */
     public function renderNonce()
     {
-        if (!AD_VALIDATE_NONCE) {
-            return false;
-        }
-
         wp_nonce_field($this->createNonceKey(), '_ad_nonce', true, true);
     }
 
@@ -34,15 +30,8 @@ class Login
      */
     public function validateNonce($username)
     {
-        if (empty($username)) {
-            return false;
-        }
 
-        if (!AD_VALIDATE_NONCE) {
-            return false;
-        }
-
-        if (wp_verify_nonce($_POST['_ad_nonce'], $this->createNonceKey())) {
+        if (isset($_POST['_ad_nonce']) && wp_verify_nonce($_POST['_ad_nonce'], $this->createNonceKey())) {
             return true;
         }
 

@@ -100,11 +100,6 @@ class App
             define('AD_BULK_IMPORT_PROPAGATE', true);
         }
 
-        //Use nonce validation (login form)
-        if (!defined('AD_VALIDATE_NONCE')) {
-            define('AD_VALIDATE_NONCE', true);
-        }
-
         //Activate cleaning actions
         if (!defined('AD_CLEANING')) {
             define('AD_CLEANING', true);
