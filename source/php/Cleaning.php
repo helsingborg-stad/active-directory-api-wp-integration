@@ -4,13 +4,12 @@ namespace adApiWpIntegration;
 
 /**
  * Cleaing functionality
- * Due to some dump cahing behaviour, wordpress creates scappy data. Clean that away.
+ * Due to some dumb cahing behaviour, wordpress creates scappy data. Clean that away.
  **/
 
 class Cleaning
 {
     private $db;
-
 
     public function __construct()
     {
