@@ -21,7 +21,7 @@ class Login
      */
     public function renderNonce()
     {
-        wp_nonce_field($this->createNonceKey(), '_ad_nonce', true, true);
+        wp_nonce_field('active_directory_nonce', '_ad_nonce', false, true);
     }
 
     /**
@@ -30,20 +30,11 @@ class Login
      */
     public function validateNonce($username)
     {
-        if (isset($_POST) && is_array($_POST) && !empty($_POST)) {
-            if (isset($_POST['_ad_nonce']) && wp_verify_nonce($_POST['_ad_nonce'], $this->createNonceKey())) {
+        if (isset($_POST) && is_array($_POST) && !empty($_POST) && isset($_POST['_ad_nonce'])) {
+            if (wp_verify_nonce($_POST['_ad_nonce'], 'active_directory_nonce') === 1) {
                 return true;
             }
-            wp_die(__("Could not verify that you are a person.", 'adintegration'));
+            wp_die(__("Could not verify this logins origin. <a href='/wp-login.php'>Please try again.</a>", 'adintegration'));
         }
-    }
-
-    /**
-     * Creates a date specific nonce
-     * @return string
-     */
-    public function createNonceKey()
-    {
-        return md5("adnoncekey" . date("Y-m-d"));
     }
 }
