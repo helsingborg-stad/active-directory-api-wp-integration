@@ -5,8 +5,8 @@ namespace adApiWpIntegration\Helper;
 class Response
 {
     /**
-     * Format Windows File Time to unix timestamp.
-     * @return string (unix timestamp)
+     * Check if the response from the server may be a error response
+     * @return bool
      */
     public static function isJsonError($response)
     {

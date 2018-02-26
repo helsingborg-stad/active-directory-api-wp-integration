@@ -70,7 +70,6 @@ class NewBlog
             if (is_user_member_of_blog($userId, $blogId) === true) {
                 return false;
             }
-
             add_user_to_blog($blogId, $userId, $this->defaultRole);
             return true;
         }
@@ -81,7 +80,6 @@ class NewBlog
                 if (is_user_member_of_blog($userId, $site->blog_id) === true) {
                     continue;
                 }
-
                 add_user_to_blog($site->blog_id, $userId, $this->defaultRole);
             }
         }
