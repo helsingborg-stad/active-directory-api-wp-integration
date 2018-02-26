@@ -60,6 +60,13 @@ class NewBlog
     public function addDefaultRole($userId, $blogId = null)
     {
 
+        //Get role (superadmin should always be administrator)
+        if (is_super_admin($userId)) {
+            $role = $this->defaultRole;
+        } else {
+            $role = "administrator";
+        }
+
         //Check that user id is a valid int
         if (!is_numeric($userId)) {
             return false;
@@ -70,7 +77,7 @@ class NewBlog
             if (is_user_member_of_blog($userId, $blogId) === true) {
                 return false;
             }
-            add_user_to_blog($blogId, $userId, $this->defaultRole);
+            add_user_to_blog($blogId, $userId, $role);
             return true;
         }
 
@@ -80,7 +87,7 @@ class NewBlog
                 if (is_user_member_of_blog($userId, $site->blog_id) === true) {
                     continue;
                 }
-                add_user_to_blog($site->blog_id, $userId, $this->defaultRole);
+                add_user_to_blog($site->blog_id, $userId, $role);
             }
         }
 

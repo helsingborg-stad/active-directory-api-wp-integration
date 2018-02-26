@@ -338,12 +338,24 @@ class BulkImport
     private function setUserRole($userId)
     {
         if (is_multisite()) {
+
+            //Get role (superadmin should always be administrator)
+            if (is_super_admin($userId)) {
+                $role = $this->defaultRole;
+            } else {
+                $role = "administrator";
+            }
+
+            //Bulk add (or just this site)
             if (defined('AD_BULK_IMPORT_PROPAGATE') && AD_BULK_IMPORT_PROPAGATE === true) {
                 foreach ($this->sites as $site) {
-                    add_user_to_blog($site->blog_id, $userId, $this->defaultRole);
+                    if (is_user_member_of_blog($userId, $site->blog_id) === true) {
+                        continue;
+                    }
+                    add_user_to_blog($site->blog_id, $userId, $role);
                 }
-            } else {
-                add_user_to_blog(get_current_blog_id(), $userId, $this->defaultRole);
+            } elseif (is_user_member_of_blog($userId, get_current_blog_id()) !== true) {
+                add_user_to_blog(get_current_blog_id(), $userId, $role);
             }
         } else {
             if (isset(get_userdata($userId)->roles) && !empty(get_userdata($userId)->roles)) {
