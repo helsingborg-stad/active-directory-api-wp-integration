@@ -5,12 +5,17 @@ namespace adApiWpIntegration;
 class NewBlog
 {
 
+    private $defaultRole;
+
     /**
      * Prevents password for being reset
      * @return void
      */
     public function __construct()
     {
+        //Set default role
+        $this->defaultRole = defined('AD_BULK_IMPORT_ROLE') ? AD_BULK_IMPORT_ROLE : "subscriber";
+
         add_action('wpmu_new_blog', array($this, 'addUsersToNewBlog'));
         add_action('ad_integration_add_users_to_site', array($this, 'addUsersToNewBlogCron'), 10, 1);
     }
