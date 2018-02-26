@@ -60,8 +60,8 @@ class NewBlog
     public function addDefaultRole($userId, $blogId = null)
     {
         // Single
-        if ($blogId) {
-            if (is_user_member_of_blog($userId, $blogId)) {
+        if (is_numeric($blogId)) {
+            if (is_user_member_of_blog($userId, $blogId) === true) {
                 return false;
             }
 
@@ -71,7 +71,7 @@ class NewBlog
 
         // Multiple
         foreach (get_sites() as $site) {
-            if (is_user_member_of_blog($userId, $site->blog_id)) {
+            if (is_user_member_of_blog($userId, $site->blog_id) === true) {
                 continue;
             }
 
