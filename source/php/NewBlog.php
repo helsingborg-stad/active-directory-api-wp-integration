@@ -76,12 +76,14 @@ class NewBlog
         }
 
         // Multiple
-        foreach (get_sites() as $site) {
-            if (is_user_member_of_blog($userId, $site->blog_id) === true) {
-                continue;
-            }
+        if (is_null($blogId)) {
+            foreach (get_sites() as $site) {
+                if (is_user_member_of_blog($userId, $site->blog_id) === true) {
+                    continue;
+                }
 
-            add_user_to_blog($site->blog_id, $userId, $this->defaultRole);
+                add_user_to_blog($site->blog_id, $userId, $this->defaultRole);
+            }
         }
 
         return true;
