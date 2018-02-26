@@ -59,6 +59,12 @@ class NewBlog
      */
     public function addDefaultRole($userId, $blogId = null)
     {
+
+        //Check that user id is a valid int
+        if (!is_numeric($userId)) {
+            return false;
+        }
+
         // Single
         if (is_numeric($blogId)) {
             if (is_user_member_of_blog($userId, $blogId) === true) {
