@@ -341,9 +341,9 @@ class BulkImport
 
             //Get role (superadmin should always be administrator)
             if (is_super_admin($userId)) {
-                $role = $this->defaultRole;
-            } else {
                 $role = "administrator";
+            } else {
+                $role = $this->defaultRole;
             }
 
             //Bulk add (or just this site)

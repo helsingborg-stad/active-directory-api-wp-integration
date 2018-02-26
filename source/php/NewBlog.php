@@ -62,9 +62,9 @@ class NewBlog
 
         //Get role (superadmin should always be administrator)
         if (is_super_admin($userId)) {
-            $role = $this->defaultRole;
-        } else {
             $role = "administrator";
+        } else {
+            $role = $this->defaultRole;
         }
 
         //Check that user id is a valid int
