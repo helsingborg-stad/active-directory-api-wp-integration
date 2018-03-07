@@ -302,7 +302,7 @@ class BulkImport
             if (!in_array($userName, $this->getLocalAccounts())) {
 
                 //Do a sanity check
-                if (!$this->userNameExists($userName)) {
+                if ($this->userNameExists($userName) === false) {
                     $userId =  wp_create_user($userName, wp_generate_password(), $this->createFakeEmail($userName));
                 } else {
                     $userId = null;
