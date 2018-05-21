@@ -43,7 +43,9 @@ class Login
     }
 
     /**
-     * Generate fake nonce
+     * Generate fake nonce.
+     * This is fake due to that the internal nonce function in wordpress is dependent on "logged in / logged out" state.
+     * We have intentionally not used WordPress native nonce function.
      * @return string
      */
     public function generateFakeNonce()
