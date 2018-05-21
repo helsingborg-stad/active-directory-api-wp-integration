@@ -47,7 +47,7 @@ class BulkImport
         //Create cronjob
         add_action('init', function () {
             if (!wp_next_scheduled('ad_integration_bulk_import')) {
-                wp_schedule_event((strtotime("midnight") + (60*60*3)), 'daily', 'ad_integration_bulk_import');
+                wp_schedule_event((strtotime("midnight") + (60 * 60 * 3)), 'daily', 'ad_integration_bulk_import');
             }
         });
 
@@ -77,7 +77,7 @@ class BulkImport
 
                 //Increase memory and runtime
                 ini_set('memory_limit', "2048M");
-                ini_set('max_execution_time', 60*60*60);
+                ini_set('max_execution_time', 60 * 60 * 60);
 
                 $this->cron();
                 echo "Manually synced the users";
@@ -92,12 +92,12 @@ class BulkImport
 
                 //Increase memory and runtime
                 ini_set('memory_limit', "2048M");
-                ini_set('max_execution_time', 60*60*60);
+                ini_set('max_execution_time', 60 * 60 * 60);
 
                 $userAccounts = $this->getLocalAccounts();
                 if (is_array($userAccounts) && !empty($userAccounts)) {
                     $userAccounts = array_chunk($userAccounts, 200);
-                    foreach ((array) $userAccounts as $index => $userChunk) {
+                    foreach ((array)$userAccounts as $index => $userChunk) {
                         $this->updateProfiles($userChunk);
                     }
                 }
@@ -115,18 +115,18 @@ class BulkImport
 
                 //Increase memory and runtime
                 ini_set('memory_limit', "2048M");
-                ini_set('max_execution_time', 60*60*60);
+                ini_set('max_execution_time', 60 * 60 * 60);
 
                 //Include required resources
                 require_once(ABSPATH . 'wp-admin/includes/user.php');
-
+                $user = adApiWpIntegration / App / getUserID();
                 $sites = get_sites();
                 if ($sites && !empty($sites)) {
                     $userAccounts = $this->getLocalAccounts();
 
                     foreach ($sites as $site) {
                         if (is_array($userAccounts) && !empty($userAccounts)) {
-                            foreach ((array) $userAccounts as $userName) {
+                            foreach ((array)$userAccounts as $userName) {
                                 if ($userId = $this->userNameExists($userName)) {
                                     if (!is_user_member_of_blog($userId, $site->blog_id)) {
                                         add_user_to_blog($site->blog_id, $userId, $this->defaultRole);
@@ -152,7 +152,7 @@ class BulkImport
 
         //Increase memory and runtime
         ini_set('memory_limit', "512M");
-        ini_set('max_execution_time', 60*60*60);
+        ini_set('max_execution_time', 60 * 60 * 60);
 
         //Include required resources
         require_once(ABSPATH . 'wp-admin/includes/user.php');
@@ -162,14 +162,15 @@ class BulkImport
         $deleteAccounts = $this->diffUserAccounts(false);
 
         //Sanity check, many users to remove?
-        $maxDeleteLimit = (int) isset($_GET['maxDeletelimit']) ? $_GET['maxDeletelimit'] : 20;
+        $maxDeleteLimit = (int)isset($_GET['maxDeletelimit']) ? $_GET['maxDeletelimit'] : 20;
         if (count($deleteAccounts) > $maxDeleteLimit) {
             if (is_main_site()) {
                 if (get_transient('ad_api_too_many_deletions') == 1) {
                     wp_mail(
                         get_option('admin_email'),
                         "Ad-integration plugin",
-                        __("To many user deletions in queue (" . count($deleteAccounts) . "/" . $maxDeleteLimit . ") add https://test.dev/wp-admin/?adbulkimport&maxDeleteLimit=100 to your query to allow number of required deletions.", "adintegration")
+                        __("To many user deletions in queue (" . count($deleteAccounts) . "/" . $maxDeleteLimit . ") add https://test.dev/wp-admin/?adbulkimport&maxDeleteLimit=100 to your query to allow number of required deletions.",
+                            "adintegration")
                     );
 
                     set_transient('ad_api_too_many_deletions', 1, 23 * HOUR_IN_SECONDS);
@@ -178,7 +179,7 @@ class BulkImport
         } else {
             //Step 2: Delete these accounts
             if (is_array($deleteAccounts) && !empty($deleteAccounts)) {
-                foreach ((array) $deleteAccounts as $accountName) {
+                foreach ((array)$deleteAccounts as $accountName) {
                     $this->deleteAccount($accountName);
                 }
             }
@@ -186,7 +187,7 @@ class BulkImport
 
         //Step 3: Create these accounts
         if (is_array($createAccounts) && !empty($createAccounts)) {
-            foreach ((array) $createAccounts as $accountName) {
+            foreach ((array)$createAccounts as $accountName) {
                 if (!in_array($accountName, $deleteAccounts)) {
                     $this->createAccount($accountName);
                 }
@@ -210,7 +211,7 @@ class BulkImport
         }
 
         //Check if has master account details
-        if (!defined('AD_BULK_IMPORT_USER')||!defined('AD_BULK_IMPORT_PASSWORD')) {
+        if (!defined('AD_BULK_IMPORT_USER') || !defined('AD_BULK_IMPORT_PASSWORD')) {
             return false;
         }
 
@@ -228,7 +229,8 @@ class BulkImport
             return $this->localAccountCache;
         }
 
-        return $this->localAccountCache = array_map('strtolower', $this->db->get_col("SELECT user_login FROM " . $this->db->users . " ORDER BY RAND()"));
+        return $this->localAccountCache = array_map('strtolower',
+            $this->db->get_col("SELECT user_login FROM " . $this->db->users . " ORDER BY RAND()"));
     }
 
     /**
@@ -245,10 +247,11 @@ class BulkImport
         );
 
         //Fetch index
-        $index = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/index', $data, 'json', array('Content-Type: application/json'));
+        $index = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/index', $data, 'json',
+            array('Content-Type: application/json'));
 
         //Validate json response
-        if ($this->response::isJsonError($index)||!json_decode($index)) {
+        if ($this->response::isJsonError($index) || !json_decode($index)) {
             return false;
         }
 
@@ -275,9 +278,9 @@ class BulkImport
         $local = $this->getLocalAccounts();
 
         if ($getMissingAccountsLocally === true) {
-            return array_diff((array) $ad, (array) $local);
+            return array_diff((array)$ad, (array)$local);
         } else {
-            return array_diff((array) $local, (array) $ad);
+            return array_diff((array)$local, (array)$ad);
         }
     }
 
@@ -285,6 +288,7 @@ class BulkImport
      * Creates a single user if it not exists.
      * @param string $userName A string with a username that corresponds to the ad username.
      * @param string $userEmail A string with a email adress that corresponds to the ad email adress.
+     * @trow \Exception
      * @return void
      */
 
@@ -303,7 +307,34 @@ class BulkImport
 
                 //Do a sanity check
                 if ($this->userNameExists($userName) === false) {
-                    $userId =  wp_create_user($userName, wp_generate_password(), $this->createFakeEmail($userName));
+
+                    // Disabled wp_create_user to avoid dupes....
+                    //$userId =  wp_create_user($userName, wp_generate_password(), $this->createFakeEmail($userName));
+
+                    try {
+
+                        $userId = $this->db->insert($this->db->users,
+                            array(
+                                'user_login' => $userName,
+                                'user_pass' => wp_generate_password(),
+                                'user_nicename' => $userName,
+                                'user_email' => $this->createFakeEmail($userName),
+                                'user_registered' => date('Y-m-d H:i:s')
+                            ),
+                            array(
+                                '%s',
+                                '%s',
+                                '%s',
+                                '%s',
+                                '%s',
+
+                            )
+                        );
+
+                    } catch (\Exception $e) {
+
+                    }
+
                 } else {
                     $userId = null;
                 }
@@ -410,7 +441,7 @@ class BulkImport
         // Above wasen't defined. Get first user id.
         $user = $this->db->get_col("SELECT ID FROM " . $this->db->users . " LIMIT 1");
         if (is_array($user) && !empty($user)) {
-            $userId = (int) array_pop($user);
+            $userId = (int)array_pop($user);
         }
 
         // Store to cache
@@ -428,12 +459,13 @@ class BulkImport
     {
         $userAccounts = $this->getLocalAccounts();
 
-        if (is_array($userAccounts) &!empty($userAccounts)) {
+        if (is_array($userAccounts) & !empty($userAccounts)) {
             $userAccounts = array_chunk($userAccounts, 200);
-            foreach ((array) $userAccounts as $index => $userChunk) {
+            foreach ((array)$userAccounts as $index => $userChunk) {
                 //Schedule chunks with 60 seconds apart (minimum cron job trigger).
                 if ($cron === true) {
-                    wp_schedule_single_event(time() + ($index*60), 'ad_integration_bulk_update_profiles', array('userNames' => $userChunk));
+                    wp_schedule_single_event(time() + ($index * 60), 'ad_integration_bulk_update_profiles',
+                        array('userNames' => $userChunk));
                 } else {
                     $this->updateProfiles($userChunk);
                 }
@@ -466,7 +498,9 @@ class BulkImport
         );
 
         //Fetch user profiles
-        $userDataArray = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/get/' . implode("/", $userNames) ."/", $data, 'json', array('Content-Type: application/json'));
+        $userDataArray = $this->curl->request('POST',
+            rtrim(AD_INTEGRATION_URL, "/") . '/user/get/' . implode("/", $userNames) . "/", $data, 'json',
+            array('Content-Type: application/json'));
 
         //Validate json response
         if ($this->response::isJsonError($userDataArray)) {
@@ -488,16 +522,17 @@ class BulkImport
 
     /**
      * Username exists
+     * @param $username
      * @return numeric/bool Returns the user id found, otherwise false. Does not use usename_exists due to the creation of WpObject on each call.
      */
 
     public function userNameExists($username)
     {
         $user = $this->db->get_col(
-                    $this->db->prepare("SELECT ID FROM " . $this->db->users . " WHERE user_login = %s LIMIT 1", $username)
-                );
+            $this->db->prepare("SELECT ID FROM " . $this->db->users . " WHERE user_login = %s LIMIT 1", $username)
+        );
         if (is_array($user) && !empty($user)) {
-            return (int) array_pop($user);
+            return (int)array_pop($user);
         }
         return false;
     }
