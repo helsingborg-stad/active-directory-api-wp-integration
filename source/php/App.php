@@ -244,7 +244,7 @@ class App
     private function signOn()
     {
 
-        $rememberMe = isset($_POST['rememberme'] && $_POST['rememberme'] == "forever") ? 'true' : false;
+        $rememberMe = isset($_POST['rememberme']) && $_POST['rememberme'] == "forever" ? 'true' : false;
 
         wp_set_auth_cookie($this->userId, $rememberMe, is_ssl(), $this->getSessionToken($this->userId));
 
