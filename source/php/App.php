@@ -243,13 +243,38 @@ class App
      */
     private function signOn()
     {
-        wp_set_auth_cookie($this->userId, true);
+
+        $rememberMe = isset($_POST['rememberme'] && $_POST['rememberme'] == "forever") ? 'true' : false;
+
+        wp_set_auth_cookie($this->userId, $rememberMe, is_ssl(), $this->getSessionToken($this->userId));
 
         $user = new \WP_User($this->userId);
 
         if (!is_wp_error($user)) {
             do_action('wp_login', $user->user_login, $user);
         }
+    }
+
+    /**
+     * Get user session token if valid
+     * return empty string or token string
+     */
+
+    private function getSessionToken($userId) {
+
+        $sessionToken = get_user_meta($userId, 'session_tokens', true);
+
+        //Token found, return it if valid time.
+        if(is_array($sessionToken) && !empty($sessionToken)) {
+            foreach($sessionToken as $key => $item) {
+                if(time() < $item['expiration']) {
+                    return $key;
+                }
+            }
+        }
+
+        //No token found, return empty default string.
+        return "";
     }
 
     /**
