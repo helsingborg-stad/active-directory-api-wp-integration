@@ -243,14 +243,12 @@ class App
      */
     private function signOn()
     {
-
+        //Get "remember me" option
         $rememberMe = isset($_POST['rememberme']) && $_POST['rememberme'] == "forever" ? 'true' : false;
 
-        wp_set_auth_cookie($this->userId, $rememberMe, is_ssl(), $this->getSessionToken($this->userId));
-
-        $user = new \WP_User($this->userId);
-
-        if (!is_wp_error($user)) {
+        //Do login.
+        if($user = wp_set_current_user($this->userId, $user->username)) {
+            wp_set_auth_cookie($user->ID, $rememberMe, is_ssl());
             do_action('wp_login', $user->user_login, $user);
         }
     }
