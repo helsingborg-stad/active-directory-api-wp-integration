@@ -244,7 +244,7 @@ class App
     private function signOn()
     {
         //Get "remember me" option
-        $rememberMe = isset($_POST['rememberme']) && $_POST['rememberme'] == "forever" ? 'true' : false;
+        $rememberMe = isset($_POST['rememberme']) && $_POST['rememberme'] == "forever" ? true : false;
 
         //Do login.
         if($user = wp_set_current_user($this->userId, $user->username)) {
