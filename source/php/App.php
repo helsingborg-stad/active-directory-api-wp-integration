@@ -138,7 +138,11 @@ class App
                 $this->profile->update($result, $this->userId);
 
                 //Signon
-                $this->signOn();
+                $this->signOn(array(
+                    'user_login' => $this->username,
+                    'user_password' => $this->password,
+                    'remember' => isset($_POST['rememberme']) && $_POST['rememberme'] == "forever" ? true : false
+                ));
 
                 //Redirect to admin panel / frontpage
                 if (in_array('subscriber', (array) get_userdata($this->userId)->roles)) {
@@ -241,38 +245,30 @@ class App
      * Authenticate user
      * @return void
      */
-    private function signOn()
+    private function signOn($credentials, $secureCookie = '')
     {
-        //Get "remember me" option
-        $rememberMe = isset($_POST['rememberme']) && $_POST['rememberme'] == "forever" ? true : false;
 
-        //Do login.
-        if($user = wp_set_current_user($this->userId, $user->username)) {
-            wp_set_auth_cookie($user->ID, $rememberMe, is_ssl());
-            do_action('wp_login', $user->user_login, $user);
-        }
-    }
-
-    /**
-     * Get user session token if valid
-     * return empty string or token string
-     */
-
-    private function getSessionToken($userId) {
-
-        $sessionToken = get_user_meta($userId, 'session_tokens', true);
-
-        //Token found, return it if valid time.
-        if(is_array($sessionToken) && !empty($sessionToken)) {
-            foreach($sessionToken as $key => $item) {
-                if(time() < $item['expiration']) {
-                    return $key;
-                }
-            }
+        //Set secure cookie
+        if ('' === $secureCookie) {
+            $secureCookie = is_ssl();
         }
 
-        //No token found, return empty default string.
-        return "";
+        //Filter secure cookie
+        $secureCookie = apply_filters( 'secure_signon_cookie', $secureCookie, $credentials );
+
+        //Pass it on as a global
+        global $auth_secure_cookie;
+        $auth_secure_cookie = $secureCookie;
+
+        //Filter auth cookie global
+        add_filter('authenticate', 'wp_authenticate_cookie', 30, 3);
+
+        //Set authentication cookie
+        wp_set_auth_cookie($this->getUserID($credentials['user_login']), $credentials['remember'], $secureCookie);
+
+        //Proceeed with normal login process
+        do_action('wp_login', $user->user_login, $user);
+
     }
 
     /**
