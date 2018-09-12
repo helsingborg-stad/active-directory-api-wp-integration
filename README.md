@@ -6,6 +6,9 @@ Integration with the simple active directory api service (https://github.com/hel
 - Use the password stored in active-directory for matching WordPress users. 
 - Update of users basic data like email, first name and last name on login. 
 
+# Database modifications
+This plugin will alter the index of the user table to require unique usernames. This is not a default behavior for WordPress and may break other plugins related to user management. 
+
 # Trigger manual bulkimport
 You can trigger a manual bulkimport. This will directly call the bulkimport function in your current call. Profile updates will be sheduled every minute following, until all WordPress users has been updated. 
 
