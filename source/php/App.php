@@ -30,7 +30,7 @@ class App
         $this->disabledNotificationEmails();
 
         //Default settings
-        add_action('init', array($this, 'defaultSettings'), 10);
+        $this->defaultSettings();
 
         //Init
         add_action('wp_authenticate', array($this, 'hijackLogin'), 20);

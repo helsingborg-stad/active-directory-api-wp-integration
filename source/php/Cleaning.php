@@ -13,7 +13,7 @@ class Cleaning
 
     public function __construct()
     {
-
+var_dump(AD_CLEANING);
         //Globals
         global $wpdb;
 
@@ -68,21 +68,21 @@ class Cleaning
     public function initCronJobs()
     {
         //Create duplciate users cron
-        add_action('init', function () {
+        add_action('admin_init', function () {
             if (!wp_next_scheduled('ad_integration_cleaning_duplicate_users')) {
                 wp_schedule_event((strtotime("midnight") + (60*60*4)), 'daily', 'ad_integration_cleaning_duplicate_users');
             }
         });
 
         //Create orphan meta cron
-        add_action('init', function () {
+        add_action('admin_init', function () {
             if (!wp_next_scheduled('ad_integration_cleaning_orphan_meta')) {
                 wp_schedule_event((strtotime("midnight") + (60*60*5)), 'daily', 'ad_integration_cleaning_orphan_meta');
             }
         });
 
         //Create empty cap cron
-        add_action('init', function () {
+        add_action('admin_init', function () {
             if (!wp_next_scheduled('ad_integration_cleaning_capabilities')) {
                 wp_schedule_event((strtotime("midnight") + (60*60*6)), 'daily', 'ad_integration_cleaning_capabilities');
             }
