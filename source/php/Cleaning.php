@@ -13,7 +13,7 @@ class Cleaning
 
     public function __construct()
     {
-var_dump(AD_CLEANING);
+
         //Globals
         global $wpdb;
 
