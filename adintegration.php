@@ -34,6 +34,7 @@ $loader->addPrefix('adApiWpIntegration', ADAPIWPINTEGRATION_PATH . 'source/php/'
 $loader->register();
 
 //Run plugin
+new adApiWpIntegration\Database(); // Database normalization
 new adApiWpIntegration\App(); //Init
 new adApiWpIntegration\Login(); // Nonce sec
 new adApiWpIntegration\Password(); //Do not allow ad-users to change their passwords
