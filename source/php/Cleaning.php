@@ -106,6 +106,8 @@ class Cleaning
                 GROUP BY user_login
             ) temp
         )");
+
+        wp_cache_flush();
     }
 
     /**
@@ -119,6 +121,8 @@ class Cleaning
           SELECT * FROM " . $this->db->users . "
             WHERE " . $this->db->usermeta . ".user_id = " . $this->db->users . ".ID
         )");
+
+        wp_cache_flush();
     }
 
     /**
@@ -128,6 +132,8 @@ class Cleaning
     public function removeEmptyCapabilities()
     {
         $this->db->query("DELETE FROM " . $this->db->usermeta . " WHERE meta_key LIKE '%" . $this->db->base_prefix . "_%capabilities%' AND meta_value = 'a:0:{}'");
+
+        wp_cache_flush();
     }
 
     /**
