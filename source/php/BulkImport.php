@@ -464,8 +464,13 @@ class BulkImport
             foreach ((array)$userAccounts as $index => $userChunk) {
                 //Schedule chunks with 60 seconds apart (minimum cron job trigger).
                 if ($cron === true) {
-                    wp_schedule_single_event(time() + ($index * 60), 'ad_integration_bulk_update_profiles',
-                        array('userNames' => $userChunk));
+                    if(!wp_next_scheduled('ad_integration_bulk_update_profiles', array('userNames' => $userChunk))) {
+                        wp_schedule_single_event(
+                            time() + ($index * 60),
+                            'ad_integration_bulk_update_profiles',
+                            array('userNames' => $userChunk)
+                        );
+                    }
                 } else {
                     $this->updateProfiles($userChunk);
                 }
