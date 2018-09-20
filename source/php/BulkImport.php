@@ -308,9 +308,6 @@ class BulkImport
                 //Do a sanity check
                 if ($this->userNameExists($userName) === false) {
 
-                    // Disabled wp_create_user to avoid dupes....
-                    //$userId =  wp_create_user($userName, wp_generate_password(), $this->createFakeEmail($userName));
-
                     try {
 
                         $userId = $this->db->insert($this->db->users,
