@@ -520,6 +520,9 @@ class BulkImport
                 }
             }
         }
+
+        //Remove this cron manually (WordPress builtin fails for some reason)
+        wp_clear_scheduled_hook('ad_integration_bulk_update_profiles', array('userNames' => $userNames));
     }
 
     /**
