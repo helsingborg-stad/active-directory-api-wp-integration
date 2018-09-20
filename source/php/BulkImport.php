@@ -463,7 +463,7 @@ class BulkImport
                 if ($cron === true) {
                     if(!wp_next_scheduled('ad_integration_bulk_update_profiles', array('userNames' => $userChunk))) {
                         wp_schedule_single_event(
-                            time() + ($index + 1),
+                            time() + 10,
                             'ad_integration_bulk_update_profiles',
                             array('userNames' => $userChunk)
                         );
