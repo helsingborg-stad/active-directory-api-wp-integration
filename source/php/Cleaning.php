@@ -69,14 +69,14 @@ class Cleaning
     {
         //Create duplciate users cron
         add_action('admin_init', function () {
-            if (!wp_next_scheduled('ad_integration_cleaning_duplicate_users')) {
+            if (is_main_site() && !wp_next_scheduled('ad_integration_cleaning_duplicate_users')) {
                 wp_schedule_event((strtotime("midnight") + (60*60*4)), 'daily', 'ad_integration_cleaning_duplicate_users');
             }
         });
 
         //Create orphan meta cron
         add_action('admin_init', function () {
-            if (!wp_next_scheduled('ad_integration_cleaning_orphan_meta')) {
+            if (is_main_site() && !wp_next_scheduled('ad_integration_cleaning_orphan_meta')) {
                 wp_schedule_event((strtotime("midnight") + (60*60*5)), 'daily', 'ad_integration_cleaning_orphan_meta');
             }
         });
