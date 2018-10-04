@@ -4,7 +4,6 @@ namespace adApiWpIntegration;
 
 class Profile
 {
-
     public $format = null;
 
     public function __construct()
@@ -20,7 +19,6 @@ class Profile
      */
     public function update($data, $user_id, $updatePassword = true)
     {
-
         //Basic definition with only an id
         $fields = array('ID' => $user_id);
 
@@ -40,8 +38,13 @@ class Profile
 
         //Update password
         if ($updatePassword === true) {
-            if (!AD_RANDOM_PASSWORD && AD_SAVE_PASSWORD && isset($_POST['pwd']) && !empty($_POST['pwd'])) {
-                $fields['user_pass'] = $_POST['pwd'];
+            // Get user object
+            $user = get_user_by('ID', $user_id);
+            if ($user && !AD_RANDOM_PASSWORD && AD_SAVE_PASSWORD && isset($_POST['pwd']) && !empty($_POST['pwd'])) {
+                // Update pw if saved pw and input does not match
+                if (!wp_check_password($_POST['pwd'], $user->data->user_pass, $user->ID)) {
+                    $fields['user_pass'] = $_POST['pwd'];
+                }
             } elseif (AD_RANDOM_PASSWORD) {
                 $fields['user_pass'] = wp_generate_password();
             }
