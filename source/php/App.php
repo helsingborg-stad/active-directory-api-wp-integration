@@ -247,7 +247,6 @@ class App
      */
     private function signOn($credentials, $secureCookie = '')
     {
-
         //Set secure cookie
         if ('' === $secureCookie) {
             $secureCookie = is_ssl();
@@ -263,12 +262,14 @@ class App
         //Filter auth cookie global
         add_filter('authenticate', 'wp_authenticate_cookie', 30, 3);
 
+        // Get user object
+        $user = get_user_by('login', $credentials['user_login']);
+
         //Set authentication cookie
-        wp_set_auth_cookie($this->getUserID($credentials['user_login']), $credentials['remember'], $secureCookie);
+        wp_set_auth_cookie($user->ID, $credentials['remember'], $secureCookie);
 
-        //Proceeed with normal login process
-        do_action('wp_login', $user->user_login, $user);
-
+        //Proceed with normal login process
+        do_action('wp_login', $credentials['user_login'], $user);
     }
 
     /**
