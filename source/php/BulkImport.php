@@ -309,25 +309,15 @@ class BulkImport
                 if ($this->userNameExists($userName) === false) {
 
                     try {
-
-                        $userId = $this->db->insert($this->db->users,
-                            array(
+                        $userData = array(
                                 'user_login' => $userName,
                                 'user_pass' => wp_generate_password(),
                                 'user_nicename' => $userName,
                                 'user_email' => $this->createFakeEmail($userName),
-                                'user_registered' => date('Y-m-d H:i:s')
-                            ),
-                            array(
-                                '%s',
-                                '%s',
-                                '%s',
-                                '%s',
-                                '%s',
-
-                            )
+                                'user_registered' => date('Y-m-d H:i:s'),
+                                'role' =>  $this->defaultRole
                         );
-
+                        $userId = wp_insert_user($userData);
                     } catch (\Exception $e) {
 
                     }
