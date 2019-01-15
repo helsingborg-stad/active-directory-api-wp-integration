@@ -119,7 +119,7 @@ class BulkImport
 
                 //Include required resources
                 require_once(ABSPATH . 'wp-admin/includes/user.php');
-                $user = adApiWpIntegration/App/getUserID();
+                $user = \adApiWpIntegration\App\getUserID();
                 $sites = get_sites();
                 if ($sites && !empty($sites)) {
                     $userAccounts = $this->getLocalAccounts();
