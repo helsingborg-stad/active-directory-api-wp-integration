@@ -230,7 +230,7 @@ class App
      * Get username with email or slug (username)
      * @return int/null
      */
-    private function getUserID($usernameOrEmail)
+    public function getUserID($usernameOrEmail)
     {
         $user = get_user_by(is_email($usernameOrEmail) ? 'email' : 'login', $usernameOrEmail);
 
