@@ -42,7 +42,7 @@ class BulkImport
         $this->curl = new Helper\Curl();
         $this->response = new Helper\Response();
         $this->db = $wpdb;
-        $this->defaultRole = defined('AD_BULK_IMPORT_ROLE') ? AD_BULK_IMPORT_ROLE : "subscriber";
+        $this->defaultRole = defined('AD_BULK_IMPORT_ROLE') && get_role(AD_BULK_IMPORT_ROLE) ? AD_BULK_IMPORT_ROLE : "subscriber";
 
         //Create cronjob
         add_action('init', function () {
@@ -53,11 +53,7 @@ class BulkImport
 
         //Set sites if is multiste
         add_action('init', function () {
-            if (is_multisite()) {
-                $this->sites = get_sites();
-            } else {
-                $this->sites = null;
-            }
+            $this->initSites();
         });
 
         //Hook cron
@@ -140,6 +136,20 @@ class BulkImport
                 exit;
             }
         }, 5);
+    }
+
+    /**
+     * Init sites
+     * @return null|array
+     */
+
+    public function initSites()
+    {
+        if (is_multisite()) {
+            return $this->sites = get_sites();
+        } else {
+            return $this->sites = null;
+        }
     }
 
     /**
@@ -309,17 +319,18 @@ class BulkImport
                 if ($this->userNameExists($userName) === false) {
 
                     try {
-                        $userData = array(
+                        $userId = wp_insert_user(
+                            array(
                                 'user_login' => $userName,
                                 'user_pass' => wp_generate_password(),
                                 'user_nicename' => $userName,
                                 'user_email' => $this->createFakeEmail($userName),
                                 'user_registered' => date('Y-m-d H:i:s'),
                                 'role' =>  $this->defaultRole
+                            )
                         );
-                        $userId = wp_insert_user($userData);
                     } catch (\Exception $e) {
-
+                        error_log("Error: Could not create a new user using bulk data (ad-api-integration).");
                     }
 
                 } else {
@@ -356,6 +367,11 @@ class BulkImport
     private function setUserRole($userId)
     {
         if (is_multisite()) {
+
+            //Init sites if not done
+            if (is_null($this->sites)) {
+                $this->initSites();
+            }
 
             //Get role (superadmin should always be administrator)
             if (is_super_admin($userId)) {
