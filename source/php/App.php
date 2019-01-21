@@ -215,11 +215,15 @@ class App
      */
     private function validateLogin($data, $username)
     {
+        if(!is_object($data)) {
+            return false; 
+        }
+
         if (isset($data->error)) {
             return false;
         }
 
-        if (strtolower($data->samaccountname) == strtolower($username)) {
+        if (isset($data->samaccountname) && strtolower($data->samaccountname) == strtolower($username)) {
             return true;
         }
 
