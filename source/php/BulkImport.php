@@ -172,9 +172,12 @@ class BulkImport
 
         //Sanity check, many users to remove?
         $maxDeleteLimit = (int)isset($_GET['maxDeletelimit']) ? $_GET['maxDeletelimit'] : 20;
+
         if (count($deleteAccounts) > $maxDeleteLimit) {
             if (is_main_site()) {
-                if (get_transient('ad_api_too_many_deletions') == 1) {
+                if (get_transient('ad_api_too_many_deletions') !== 1) {
+
+                    //Send mail
                     wp_mail(
                         get_option('admin_email'),
                         "Ad-integration plugin",
@@ -182,6 +185,10 @@ class BulkImport
                             "adintegration")
                     );
 
+                    //Write to log
+                    error_log("Ad-integration plugin: To many user deletions in queue (" . count($deleteAccounts) . "/" . $maxDeleteLimit . ") add https://test.dev/wp-admin/?adbulkimport&maxDeleteLimit=100 to your query to allow number of required deletions.");
+
+                    //Prevent this mail for 24 hours
                     set_transient('ad_api_too_many_deletions', 1, 23 * HOUR_IN_SECONDS);
                 }
             }
