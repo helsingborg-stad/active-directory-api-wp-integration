@@ -171,7 +171,7 @@ class BulkImport
         $deleteAccounts = $this->diffUserAccounts(false);
 
         //Sanity check, many users to remove?
-        $maxDeleteLimit = (int)isset($_GET['maxDeletelimit']) ? $_GET['maxDeletelimit'] : 20;
+        $maxDeleteLimit = (int)isset($_GET['maxDeletelimit']) ? $_GET['maxDeletelimit'] : 100;
 
         if (count($deleteAccounts) > $maxDeleteLimit) {
             if (is_main_site()) {
