@@ -79,6 +79,16 @@ class Curl
         curl_setopt_array($ch, $arguments);
         $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $response = curl_exec($ch);
+
+        //Check if curl wen't trough
+        if($curlError = curl_error ($ch)) {
+            return new \WP_Error(
+                'ad_api_connection_error',
+                $curlError
+            ); 
+        }
+        
+        //Close connection
         curl_close($ch);
 
         /**

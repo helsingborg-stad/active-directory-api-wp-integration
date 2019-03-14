@@ -131,40 +131,44 @@ class App
             //Fetch user from api
             $result = $this->fetchUser($this->username, $this->password);
 
-            //Validate signon
-            if ($this->validateLogin($result, $this->username) && $result !== false) {
+            //Abort if theres a error
+            if($result !== false) {
+                    
+                //Validate signon
+                if ($this->validateLogin($result, $this->username) && $result !== false) {
 
-                //Update user profile
-                $this->profile->update($result, $this->userId);
+                    //Update user profile
+                    $this->profile->update($result, $this->userId);
 
-                //Signon
-                $this->signOn(array(
-                    'user_login' => $this->username,
-                    'user_password' => $this->password,
-                    'remember' => isset($_POST['rememberme']) && $_POST['rememberme'] == "forever" ? true : false
-                ));
+                    //Signon
+                    $this->signOn(array(
+                        'user_login' => $this->username,
+                        'user_password' => $this->password,
+                        'remember' => isset($_POST['rememberme']) && $_POST['rememberme'] == "forever" ? true : false
+                    ));
 
-                //Redirect to admin panel / frontpage
-                if (in_array('subscriber', (array) get_userdata($this->userId)->roles)) {
+                    //Redirect to admin panel / frontpage
+                    if (in_array('subscriber', (array) get_userdata($this->userId)->roles)) {
 
-                    //Get bulitin referer
-                    if (isset($_POST['_wp_http_referer'])) {
-                        $referer = $_POST['_wp_http_referer'];
-                    } else {
-                        $referer = "/";
-                    }
+                        //Get bulitin referer
+                        if (isset($_POST['_wp_http_referer'])) {
+                            $referer = $_POST['_wp_http_referer'];
+                        } else {
+                            $referer = "/";
+                        }
 
-                    //Redirect to correct url
-                    if (is_multisite()) {
-                        wp_redirect(apply_filters('adApiWpIntegration/login/subscriberRedirect', network_home_url($referer)));
+                        //Redirect to correct url
+                        if (is_multisite()) {
+                            wp_redirect(apply_filters('adApiWpIntegration/login/subscriberRedirect', network_home_url($referer)));
+                            exit;
+                        }
+                        wp_redirect(apply_filters('adApiWpIntegration/login/subscriberRedirect', home_url($referer)));
                         exit;
                     }
-                    wp_redirect(apply_filters('adApiWpIntegration/login/subscriberRedirect', home_url($referer)));
+
+                    wp_redirect(apply_filters('adApiWpIntegration/login/defaultRedirect', admin_url("?auth=active-directory")));
                     exit;
                 }
-
-                wp_redirect(apply_filters('adApiWpIntegration/login/defaultRedirect', admin_url("?auth=active-directory")));
-                exit;
             }
         }
     }
@@ -189,6 +193,11 @@ class App
 
             //Make Curl
             $result = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/current', $data, 'json', array('Content-Type: application/json'));
+
+            //Is curl error
+            if(is_wp_error($result)) {
+                return false; 
+            }
 
             //Is json error
             if ($response::isJsonError($result)) {
