@@ -528,7 +528,8 @@ class BulkImport
         if (is_array($userDataArray) && !empty($userDataArray)) {
             foreach ($userDataArray as $user) {
                 if (isset($user->samaccountname) && $userId = $this->userNameExists($user->samaccountname)) {
-                    $this->profile->update($user, $userId, false);
+                    $this->profile->update($user, $userId, false); //Update profile
+                    $this->setUserRole($userId); //Enshure that the user has a role on every site
                 }
             }
         }
