@@ -14,6 +14,21 @@ class Admin
     public function __construct()
     {
         add_action('init', array($this, 'init'), 15);
+        add_action( 'admin_footer', function () {
+            global $pagenow;
+
+            if($pagenow == "user-new.php") {
+                echo '
+                    <script>
+                        const notification = document.getElementById("send_user_notification");
+                        if(notification !== null) {
+                            notification.checked = false;
+                            notification.parentElement.parentElement.style.display = "none";
+                        }
+                    </script>
+                '; 
+            }
+        });
     }
 
     public function init()
