@@ -26,6 +26,12 @@ class Admin
             //Multi site - blog 
             if($pagenow == "user-new.php" && is_multisite()) {
                 echo '
+                <style>
+                    #adduser tr:last-child {
+                        display: none;    
+                    }
+                </style>
+                
                     <script>
                         const notification = document.getElementById("adduser-noconfirmation");
                         if(notification !== null) {
