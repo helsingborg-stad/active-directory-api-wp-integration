@@ -14,6 +14,12 @@ class Admin
     public function __construct()
     {
         add_action('init', array($this, 'init'), 15);
+
+        add_filter('wpmu_signup_user_notification', function ($user, $user_email, $key, $meta) {
+            wpmu_activate_signup($key);
+            return false;
+        }, 10, 4);
+        
         add_action( 'admin_footer', function () {
             global $pagenow;
 
@@ -25,6 +31,14 @@ class Admin
                         if(notification !== null) {
                             notification.checked = true;
                             notification.parentElement.parentElement.style.display = "none";
+                        }
+                    </script>
+
+                    <script>
+                        const notification2 = document.getElementById("noconfirmation");
+                        if(notification2 !== null) {
+                            notification2.checked = true;
+                            notification2.parentElement.parentElement.style.display = "none";
                         }
                     </script>
                 '; 
