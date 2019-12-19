@@ -15,61 +15,66 @@ class Admin
     {
         add_action('init', array($this, 'init'), 15);
 
-        add_filter('wpmu_signup_user_notification', function ($user, $user_email, $key, $meta) {
-            wpmu_activate_signup($key);
-            return false;
-        }, 10, 4);
-        
-        add_action( 'admin_footer', function () {
-            global $pagenow;
+        //Disables email verification of accounts
+        add_filter('wpmu_signup_user_notification', array($this, 'disableEmailVerificationNetwork'), 10, 4);
+        add_action( 'admin_footer', array($this, 'disableEmailVerification')); 
+        add_action( 'admin_footer', array($this, 'hideEmailVerificationNetworkLabel')); 
+    }
 
-            //Multi site - blog 
-            if($pagenow == "user-new.php" && is_multisite()) {
-                echo '
+    /**
+     * Auto check boxes for email verifications
+     * @return void
+     */
+    public function disableEmailVerification() {
+
+        global $pagenow;
+
+        if($pagenow == "user-new.php") {
+            echo '
+                <script>
+                    let settingsObject = [
+                        {id: "adduser-noconfirmation", checkState: true},
+                        {id: "noconfirmation", checkState: true},
+                        {id: "send_user_notification", checkState: false}
+                    ]; 
+                    settingsObject.forEach(function(item) {
+                        let target = document.getElementById(item.id);
+                        if(target !== null) {
+                            target.checked = item.checkState;
+                            target.parentElement.parentElement.style.display = "none";
+                        }
+                    }); 
+                </script>
+            ';
+        }
+    }
+
+    /**
+     * Auto activate signup
+     * @return bool
+     */
+    public function disableEmailVerificationNetwork($user, $user_email, $key, $meta) {
+        wpmu_activate_signup($key);
+        return false;
+    }
+
+    /**
+     * Hide the label for add user in network, because it's untrue. 
+     * @return void
+     */
+    public function hideEmailVerificationNetworkLabel() {
+
+        global $pagenow;
+
+        if($pagenow == "user-new.php" && is_multisite() && is_network_admin()) {
+            echo'
                 <style>
                     #adduser tr:last-child {
                         display: none;    
                     }
                 </style>
-                
-                    <script>
-                        const notification = document.getElementById("adduser-noconfirmation");
-                        if(notification !== null) {
-                            notification.checked = true;
-                            notification.parentElement.parentElement.style.display = "none";
-                        }
-                    </script>
-
-                    <script>
-                        const notification2 = document.getElementById("noconfirmation");
-                        if(notification2 !== null) {
-                            notification2.checked = true;
-                            notification2.parentElement.parentElement.style.display = "none";
-                        }
-                    </script>
-                '; 
-            }
-
-            //Multi site - network
-            if($pagenow == "user-new.php" && is_multisite()) {
-
-            }
-
-
-
-            //Single site
-            if($pagenow == "user-new.php" && !is_multisite()) {
-                echo '
-                    <script>
-                        const notification = document.getElementById("send_user_notification");
-                        if(notification !== null) {
-                            notification.checked = false;
-                            notification.parentElement.parentElement.style.display = "none";
-                        }
-                    </script>
-                '; 
-            }
-        });
+            ';
+        }
     }
 
     public function init()
