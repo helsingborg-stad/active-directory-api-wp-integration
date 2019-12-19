@@ -17,7 +17,28 @@ class Admin
         add_action( 'admin_footer', function () {
             global $pagenow;
 
-            if($pagenow == "user-new.php") {
+            //Multi site - blog 
+            if($pagenow == "user-new.php" && is_multisite()) {
+                echo '
+                    <script>
+                        const notification = document.getElementById("adduser-noconfirmation");
+                        if(notification !== null) {
+                            notification.checked = true;
+                            notification.parentElement.parentElement.style.display = "none";
+                        }
+                    </script>
+                '; 
+            }
+
+            //Multi site - network
+            if($pagenow == "user-new.php" && is_multisite()) {
+
+            }
+
+
+
+            //Single site
+            if($pagenow == "user-new.php" && !is_multisite()) {
                 echo '
                     <script>
                         const notification = document.getElementById("send_user_notification");
