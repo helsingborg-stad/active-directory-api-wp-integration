@@ -104,6 +104,11 @@ class App
         if (!defined('AD_CLEANING')) {
             define('AD_CLEANING', true);
         }
+
+        //Activate autocreate action
+        if (!defined('AD_AUTOCREATE_USER')) {
+            define('AD_AUTOCREATE_USER', true);
+        }
     }
 
     /**
@@ -120,57 +125,73 @@ class App
         //Store to class
         $this->username = $username;
         $this->password = isset($_POST['pwd']) ? $_POST['pwd'] : "";
-        $this->userId   = $this->getUserID($username);
 
-        if (is_numeric($this->userId) && !empty($this->userId)) {
+        if (!defined('AD_AUTOCREATE_USER') || AD_AUTOCREATE_USER === false) {
+            $this->userId = $this->getUserID($username);
 
-            //Init required classes
-            $this->curl = new Helper\Curl();
-            $this->profile = new Profile();
-
-            //Fetch user from api
-            $result = $this->fetchUser($this->username, $this->password);
-
-            //Abort if theres a error
-            if($result !== false) {
-                    
-                //Validate signon
-                if ($this->validateLogin($result, $this->username) && $result !== false) {
-
-                    //Update user profile
-                    $this->profile->update($result, $this->userId);
-
-                    //Signon
-                    $this->signOn(array(
-                        'user_login' => $this->username,
-                        'user_password' => $this->password,
-                        'remember' => isset($_POST['rememberme']) && $_POST['rememberme'] == "forever" ? true : false
-                    ));
-
-                    //Redirect to admin panel / frontpage
-                    if (in_array('subscriber', (array) get_userdata($this->userId)->roles)) {
-
-                        //Get bulitin referer
-                        if (isset($_POST['_wp_http_referer'])) {
-                            $referer = $_POST['_wp_http_referer'];
-                        } else {
-                            $referer = "/";
-                        }
-
-                        //Redirect to correct url
-                        if (is_multisite()) {
-                            wp_redirect(apply_filters('adApiWpIntegration/login/subscriberRedirect', network_home_url($referer)));
-                            exit;
-                        }
-                        wp_redirect(apply_filters('adApiWpIntegration/login/subscriberRedirect', home_url($referer)));
-                        exit;
-                    }
-
-                    wp_redirect(apply_filters('adApiWpIntegration/login/defaultRedirect', admin_url("?auth=active-directory")));
-                    exit;
-                }
+            if (is_numeric($this->userId) && !empty($this->userId)) {
+                return;
             }
         }
+
+        //Init required classes
+        $this->curl = new Helper\Curl();
+        $this->profile = new Profile();
+
+        //Fetch user from api
+        $result = $this->fetchUser($this->username, $this->password);
+
+        //Abort if theres a error
+        if($result !== false) {
+                
+            //Validate signon
+            if ($this->validateLogin($result, $this->username) && $result !== false) {
+                
+                $this->userId = $this->getUserID($username);
+
+                if (defined('AD_AUTOCREATE_USER') || AD_AUTOCREATE_USER === true) {
+                    Helper\AutoCreate::autoCreateUser($this->username, $this->password, $result, $this->userId);
+                }
+                
+                //Update user profile
+                $this->profile->update($result, $this->userId);
+
+                //Signon
+                $this->signOn(array(
+                    'user_login' => $this->username,
+                    'user_password' => $this->password,
+                    'remember' => isset($_POST['rememberme']) && $_POST['rememberme'] == "forever" ? true : false
+                ));
+
+                //Redirect to admin panel / frontpage
+                if (in_array('subscriber', (array) get_userdata($this->userId)->roles)) {
+
+                    //Get bulitin referer
+                    if (isset($_POST['_wp_http_referer'])) {
+                        $referer = $_POST['_wp_http_referer'];
+                    } else {
+                        $referer = "/";
+                    }
+
+                    //Redirect to correct url
+                    if (is_multisite()) {
+                        wp_redirect(apply_filters('adApiWpIntegration/login/subscriberRedirect', network_home_url($referer)));
+                        exit;
+                    }
+                    wp_redirect(apply_filters('adApiWpIntegration/login/subscriberRedirect', home_url($referer)));
+                    exit;
+                }
+
+                if (defined('AD_AUTOCREATE_USER') || AD_AUTOCREATE_USER === true) {
+                    wp_redirect(apply_filters('adApiWpIntegration/login/editorRedirect', home_url($referer)));
+                    exit;
+                }
+
+                wp_redirect(apply_filters('adApiWpIntegration/login/defaultRedirect', admin_url("?auth=active-directory")));
+                exit;
+            }
+        }
+        
     }
 
 
@@ -180,7 +201,7 @@ class App
      */
     private function fetchUser($username, $password)
     {
-        if (!empty($username) && !empty($password) && is_numeric($this->userId)) {
+        if (!empty($username) && !empty($password)) {
 
             //Create login post data
             $data = array(
@@ -192,7 +213,7 @@ class App
             $response = new Helper\Response();
 
             //Make Curl
-            $result = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/current', $data, 'json', array('Content-Type: application/json'));
+            $result = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/current/', $data, 'json', array('Content-Type: application/json'));
 
             //Is curl error
             if(is_wp_error($result)) {
