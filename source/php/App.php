@@ -107,7 +107,12 @@ class App
 
         //Activate autocreate action
         if (!defined('AD_AUTOCREATE_USER')) {
-            define('AD_AUTOCREATE_USER', true);
+            define('AD_AUTOCREATE_USER', false);
+        }
+
+        //Activate autocreate action
+        if (!defined('AD_AUTOCREATE_ROLE')) {
+            define('AD_AUTOCREATE_ROLE', "subscriber");
         }
     }
 
@@ -126,7 +131,8 @@ class App
         $this->username = $username;
         $this->password = isset($_POST['pwd']) ? $_POST['pwd'] : "";
 
-        if (!defined('AD_AUTOCREATE_USER') || AD_AUTOCREATE_USER === false) {
+        //Only assume thre's a existing user id if autocreate is off
+        if (!defined('AD_AUTOCREATE_USER') || (defined('AD_AUTOCREATE_USER') && AD_AUTOCREATE_USER === false)) {
             $this->userId = $this->getUserID($username);
 
             if (is_numeric($this->userId) && !empty($this->userId)) {
@@ -147,11 +153,13 @@ class App
             //Validate signon
             if ($this->validateLogin($result, $this->username) && $result !== false) {
                 
-                $this->userId = $this->getUserID($username);
-
-                if (defined('AD_AUTOCREATE_USER') || AD_AUTOCREATE_USER === true) {
-                    Helper\AutoCreate::autoCreateUser($this->username, $this->password, $result, $this->userId);
+                //Auto create a user account
+                if (defined('AD_AUTOCREATE_USER') && AD_AUTOCREATE_USER === true) {
+                    Helper\AutoCreate::autoCreateUser($this->username, $this->password, $result);
                 }
+
+                //Get the user id
+                $this->userId = $this->getUserID($username);
                 
                 //Update user profile
                 $this->profile->update($result, $this->userId);
