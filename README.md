@@ -33,6 +33,8 @@ Remove user capabilitys that are empty: https://site.dev/wp-admin/?adcleancap
 - AD_USER_DOMAIN: Define a domain that belongs to ad-users (to block password reset). *
 
 # Options Bulk Import (Define Constants)
+These options imports all users avabile in active directory nightly. 
+
 - AD_BULK_IMPORT: Turn on or off bulk import (true/false)
 - AD_BULK_IMPORT_USER: User account that can read all items in the ad
 - AD_BULK_IMPORT_PASSWORD: Password to the account name above
@@ -40,8 +42,15 @@ Remove user capabilitys that are empty: https://site.dev/wp-admin/?adcleancap
 - AD_BULK_IMPORT_REASSIGN_USERNAME: Reassign content of deleted users to this username. Will fallback to first user if not set or the user is missing. 
 - AD_BULK_IMPORT_PROPAGATE: Propagate users on the whole network of blogs (default to true). 
 
+# Options Auto Create Users
+These options creates a user on the site if it exists in active directory on signon.  
+
+- AD_AUTOCREATE_USER: Turn on or off auto signup (true/false)
+- AD_AUTOCREATE_ROLE: Default role to assign new users (default to "subscriber")
+
 * Be careful setting these options. All of them are not compatible. For instance: You cannot save the password, and generate a random password.
 ** Ad upodate meta should be set in order to enable ad_meta_prefix constant. 
+
 
 # Filters 
 Filter the meta keys stored in the database. 
