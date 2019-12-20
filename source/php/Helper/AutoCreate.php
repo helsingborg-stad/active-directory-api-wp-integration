@@ -4,6 +4,13 @@ namespace adApiWpIntegration\Helper;
 
 class AutoCreate
 {
+
+    private $defaultRole;
+
+    public function __construct() {
+        $this->defaultRole = defined('AD_AUTOCREATE_ROLE') && get_role(AD_AUTOCREATE_ROLE) ? AD_AUTOCREATE_ROLE : "subscriber";
+    }
+
     public static function autoCreateUser($userName, $passWord)
     {
         try {
@@ -11,7 +18,7 @@ class AutoCreate
                 array(
                     'user_login' => $userName,
                     'user_pass' => $passWord,
-                    'role' =>  $this->defaultRole = defined('AD_AUTOCREATE_ROLE') && get_role(AD_AUTOCREATE_ROLE) ? AD_AUTOCREATE_ROLE : "subscriber"
+                    'role' =>  $this->defaultRole
                 )
             );
         } catch (\Exception $e) {
