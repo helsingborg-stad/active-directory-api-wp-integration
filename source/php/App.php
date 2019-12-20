@@ -213,7 +213,7 @@ class App
             $response = new Helper\Response();
 
             //Make Curl
-            $result = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/current/', $data, 'json', array('Content-Type: application/json'));
+            $result = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/current', $data, 'json', array('Content-Type: application/json'));
 
             //Is curl error
             if(is_wp_error($result)) {
