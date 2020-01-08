@@ -190,9 +190,6 @@ class App
                     exit;
                 }
 
-                wp_redirect(apply_filters('adApiWpIntegration/login/editorRedirect', home_url($referer)));
-                exit;
-
                 wp_redirect(apply_filters('adApiWpIntegration/login/defaultRedirect', admin_url("?auth=active-directory")));
                 exit;
             }
