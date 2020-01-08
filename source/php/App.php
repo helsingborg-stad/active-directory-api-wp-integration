@@ -190,10 +190,8 @@ class App
                     exit;
                 }
 
-                if (defined('AD_AUTOCREATE_USER') || AD_AUTOCREATE_USER === true) {
-                    wp_redirect(apply_filters('adApiWpIntegration/login/editorRedirect', home_url($referer)));
-                    exit;
-                }
+                wp_redirect(apply_filters('adApiWpIntegration/login/editorRedirect', home_url($referer)));
+                exit;
 
                 wp_redirect(apply_filters('adApiWpIntegration/login/defaultRedirect', admin_url("?auth=active-directory")));
                 exit;
