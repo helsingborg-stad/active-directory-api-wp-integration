@@ -8,8 +8,11 @@ class AutoCreate
 
     public static function autoCreateUser($username, $password)
     {
+
         $defaultRole = defined('AD_AUTOCREATE_ROLE') && get_role(AD_AUTOCREATE_ROLE) ? AD_AUTOCREATE_ROLE : "subscriber";
         try {
+
+          if (!$insertUser = username_exists($username)) {
             $insertUser = wp_insert_user(
                 array(
                     'user_login' => $username,
@@ -17,9 +20,10 @@ class AutoCreate
                     'role' =>  $defaultRole
                 )
             );
+          }
 
           if(is_numeric($insertUser) && is_multisite()) {
-              add_user_to_blog(get_current_blog_id(), $insertUser, $defaultRole); 
+              add_user_to_blog(get_current_blog_id(), $insertUser, $defaultRole);
           }
 
         } catch (\Exception $e) {
