@@ -23,7 +23,9 @@ class AutoCreate
           }
 
           if(is_numeric($insertUser) && is_multisite()) {
-              add_user_to_blog(get_current_blog_id(), $insertUser, $defaultRole);
+                if(!is_user_member_of_blog($insertUser, get_current_blog_id())) {
+                    add_user_to_blog(get_current_blog_id(), $insertUser, $defaultRole);
+                }
           }
 
         } catch (\Exception $e) {
