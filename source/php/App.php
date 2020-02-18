@@ -135,7 +135,7 @@ class App
         if (!defined('AD_AUTOCREATE_USER') || (defined('AD_AUTOCREATE_USER') && AD_AUTOCREATE_USER === false)) {
             $this->userId = $this->getUserID($username);
 
-            if (is_numeric($this->userId) && !empty($this->userId)) {
+            if (!is_numeric($this->userId)) {
                 return;
             }
         }
