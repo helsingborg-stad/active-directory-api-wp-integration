@@ -183,14 +183,30 @@ class App
 
                     //Redirect to correct url
                     if (is_multisite()) {
-                        wp_redirect(apply_filters('adApiWpIntegration/login/subscriberRedirect', network_home_url($referer)));
+                        $this->sendNoCacheHeader(); 
+                        wp_redirect(
+                            apply_filters('adApiWpIntegration/login/subscriberRedirect', 
+                                $this->appendQueryString(network_home_url($referer), 'login', 'true')
+                            )
+                        );
                         exit;
                     }
-                    wp_redirect(apply_filters('adApiWpIntegration/login/subscriberRedirect', home_url($referer)));
+                    
+                    $this->sendNoCacheHeader(); 
+                    wp_redirect(
+                        apply_filters('adApiWpIntegration/login/subscriberRedirect', 
+                            $this->appendQueryString(home_url($referer), 'login', 'true')
+                        )
+                    );
                     exit;
                 }
 
-                wp_redirect(apply_filters('adApiWpIntegration/login/defaultRedirect', admin_url("?auth=active-directory")));
+                $this->sendNoCacheHeader(); 
+                wp_redirect(
+                    apply_filters('adApiWpIntegration/login/defaultRedirect',
+                        $this->appendQueryString(admin_url("?auth=active-directory"), 'login', 'true')
+                    )
+                );
                 exit;
             }
         }
@@ -322,5 +338,32 @@ class App
         }
 
         return null;
+    }
+
+    /**
+     * Send nocache header
+     */
+    private function sendNoCacheHeader() {
+        header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+        header("Cache-Control: post-check=0, pre-check=0", false);
+        header("Pragma: no-cache");
+    }
+
+    /**
+     * Append query string
+     *
+     * @param string $url
+     * @param string $queryParameter
+     * @param string $queryValue
+     * @return string
+     */
+    private function appendQueryString($url, $queryParameter, $queryValue) {
+        if(strpos($url,'?') !== false) {
+            $url .= '&' .$queryParameter. '=' .$queryValue;
+        } else {
+            $url .= '?' .$queryParameter. '=' .$queryValue;
+        }
+
+        return $url; 
     }
 }
