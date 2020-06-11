@@ -203,6 +203,7 @@ class BulkImport
 
         //Step 3: Create these accounts
         if (is_array($createAccounts) && !empty($createAccounts)) {
+
             foreach ((array)$createAccounts as $accountName) {
                 if (!in_array($accountName, $deleteAccounts)) {
                     $this->createAccount($accountName);
@@ -332,9 +333,10 @@ class BulkImport
                                 'user_nicename' => $userName,
                                 'user_email' => $this->createFakeEmail($userName),
                                 'user_registered' => date('Y-m-d H:i:s'),
-                                'role' =>  $this->defaultRole
+                                'role' =>  $this->defaultRole ? $this->defaultRole : 'subscriber'
                             )
                         );
+
                     } catch (\Exception $e) {
                         error_log("Error: Could not create a new user using bulk data (ad-api-integration).");
                     }
@@ -383,7 +385,7 @@ class BulkImport
             if (is_super_admin($userId)) {
                 $role = "administrator";
             } else {
-                $role = $this->defaultRole;
+                $role = $this->defaultRole ? $this->defaultRole : 'subscriber';
             }
 
             //Bulk add (or just this site)
