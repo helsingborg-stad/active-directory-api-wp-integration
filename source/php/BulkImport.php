@@ -403,7 +403,8 @@ class BulkImport
             if (isset(get_userdata($userId)->roles) && !empty(get_userdata($userId)->roles)) {
                 return false;
             }
-            wp_update_user(array('ID' => $userId, 'role' => $this->defaultRole));
+            wp_update_user(array('ID' => $userId, 'role' => $this->defaultRole ?
+                $this->defaultRole : 'subscriber'));
         }
     }
 
