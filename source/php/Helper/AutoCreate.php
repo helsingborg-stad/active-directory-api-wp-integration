@@ -17,7 +17,7 @@ class AutoCreate
                 array(
                     'user_login' => $username,
                     'user_pass' => $password,
-                    'role' =>  $defaultRole
+                    'role' =>  $defaultRole ? $defaultRole : 'subscriber'
                 )
             );
           }

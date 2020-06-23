@@ -64,7 +64,7 @@ class NewBlog
         if (is_super_admin($userId)) {
             $role = "administrator";
         } else {
-            $role = $this->defaultRole;
+            $role = $this->defaultRole ? $this->defaultRole : 'subscriber';
         }
 
         //Check that user id is a valid int

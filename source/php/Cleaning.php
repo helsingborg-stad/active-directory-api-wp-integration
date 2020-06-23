@@ -131,8 +131,9 @@ class Cleaning
      */
     public function removeEmptyCapabilities()
     {
-        $this->db->query("DELETE FROM " . $this->db->usermeta . " WHERE meta_key LIKE '%" . $this->db->base_prefix . "_%capabilities%' AND meta_value = 'a:0:{}'");
-
+        //F.Y.I Changed removed _%capabilities to _capabilities
+        $this->db->query("DELETE FROM " . $this->db->usermeta . " WHERE meta_key LIKE '%" .
+            $this->db->base_prefix . "_capabilities%' AND meta_value = 'a:0:{}' ");
         wp_cache_flush();
     }
 
