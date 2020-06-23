@@ -131,10 +131,14 @@ class Cleaning
      */
     public function removeEmptyCapabilities()
     {
-        //F.Y.I Changed removed _%capabilities to _capabilities
-        $this->db->query("DELETE FROM " . $this->db->usermeta . " WHERE meta_key LIKE '%" .
-            $this->db->base_prefix . "_capabilities%' AND meta_value = 'a:0:{}' ");
-        wp_cache_flush();
+        try {
+            //F.Y.I Changed removed _%capabilities to _capabilities
+            $this->db->query("DELETE FROM " . $this->db->usermeta . " WHERE meta_key LIKE '%" .
+                $this->db->base_prefix . "_capabilities%' AND meta_value = 'a:0:{}' ");
+            wp_cache_flush();
+        } catch (\Exception $e) {
+            \adApiWpIntegration\Helper\Log::LogStackTrace($e);
+        }
     }
 
     /**
