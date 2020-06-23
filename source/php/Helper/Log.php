@@ -12,6 +12,7 @@ class Log
      * LogStackTrace
      * writing error stack to log fle
      * @param $error
+     * @return void
      */
     public static function LogStackTrace($error)
     {
