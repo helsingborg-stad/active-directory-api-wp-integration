@@ -144,8 +144,11 @@ class App
         $this->curl = new Helper\Curl();
         $this->profile = new Profile();
 
+        // Strip slashes from password that will be sent to AD
+        $strippedPassword = stripslashes($this->password);
+
         //Fetch user from api
-        $result = $this->fetchUser($this->username, $this->password);
+        $result = $this->fetchUser($this->username, $strippedPassword);
 
         //Abort if theres a error
         if($result !== false) {
