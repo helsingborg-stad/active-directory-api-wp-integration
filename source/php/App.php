@@ -144,11 +144,17 @@ class App
         $this->curl = new Helper\Curl();
         $this->profile = new Profile();
 
-        // Strip slashes from password that will be sent to AD
-        $strippedPassword = stripslashes($this->password);
+        // Unescape all characters from password that will be sent to Active Directory
+        $unescapedPassword = stripslashes($this->password);
+        /**
+        * Escape only characters that is required by Active Directory
+        * Escaping is needed for following characters: , \ # + < > ; " = Leading or trailing spaces
+        * NO escaping is needed for following characters: * ( ) . & - _ [ ] ` ~ | @ $ % ^ ? : { } ! ')
+        **/
+        $adEscapedPassword = preg_replace('/([,\#+<>;"= ])/', '\\\\$1', $unescapedPassword);
 
         //Fetch user from api
-        $result = $this->fetchUser($this->username, $strippedPassword);
+        $result = $this->fetchUser($this->username, $adEscapedPassword);
 
         //Abort if theres a error
         if ($result !== false) {
