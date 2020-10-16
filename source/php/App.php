@@ -148,10 +148,12 @@ class App
         $unescapedPassword = stripslashes($this->password);
         /**
         * Escape only characters that is required by Active Directory
-        * Escaping is needed for following characters: , \ # + < > ; " = Leading or trailing spaces
-        * NO escaping is needed for following characters: * ( ) . & - _ [ ] ` ~ | @ $ % ^ ? : { } ! ')
+        * Escaping is needed for following characters: ,\#+<>;"= AND Leading or trailing spaces
+        * NO escaping is needed for following characters: *().&-_[]`~|@$%^?:{}!')
         **/
-        $adEscapedPassword = preg_replace('/([,\#+<>;"= ])/', '\\\\$1', $unescapedPassword);
+        $adEscapedPassword = preg_replace('/([,\#+<>;"=])/', '\\\\$1', $unescapedPassword);
+        // Escape leading and trailing spaces
+        $adEscapedPassword = $this->escapeLeadingAndTrailingSpaces($adEscapedPassword);
 
         //Fetch user from api
         $result = $this->fetchUser($this->username, $adEscapedPassword);
@@ -224,6 +226,38 @@ class App
         }
     }
 
+    /**
+     * Escapes leading and trailing spaces from a string
+     *
+     * @param string $string
+     * @return void
+     */
+    private function escapeLeadingAndTrailingSpaces($string)
+    {
+        $characterArray = str_split($string);
+
+        foreach ($characterArray as &$value) {
+            if ($value !== ' ') {
+                break;
+            }
+
+            $value = '\\' . $value;
+        }
+
+        $reversedCharacterArray = array_reverse($characterArray);
+
+        foreach ($reversedCharacterArray as &$value) {
+            if ($value !== ' ') {
+                break;
+            }
+
+            $value = '\\' . $value;
+        }
+
+        $escapedString = implode('', array_reverse($reversedCharacterArray));
+
+        return $escapedString;
+    }
 
     /**
      * Get information from the api-service
