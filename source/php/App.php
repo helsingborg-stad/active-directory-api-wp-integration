@@ -144,15 +144,26 @@ class App
         $this->curl = new Helper\Curl();
         $this->profile = new Profile();
 
+        // Unescape all characters from password that will be sent to Active Directory
+        $unescapedPassword = stripslashes($this->password);
+        /**
+        * Escape only characters that is required by Active Directory
+        * Escaping is needed for following characters: ,\#+<>;"= AND Leading or trailing spaces
+        * NO escaping is needed for following characters: *().&-_[]`~|@$%^?:{}!')
+        **/
+        $adEscapedPassword = preg_replace('/([,\#+<>;"=])/', '\\\\$1', $unescapedPassword);
+        // Escape leading and trailing spaces
+        $adEscapedPassword = $this->escapeLeadingAndTrailingSpaces($adEscapedPassword);
+
         //Fetch user from api
-        $result = $this->fetchUser($this->username, $this->password);
+        $result = $this->fetchUser($this->username, $adEscapedPassword);
 
         //Abort if theres a error
-        if($result !== false) {
-                
+        if ($result !== false) {
+
             //Validate signon
             if ($this->validateLogin($result, $this->username) && $result !== false) {
-                
+
                 //Auto create a user account
                 if (defined('AD_AUTOCREATE_USER') && AD_AUTOCREATE_USER === true) {
                     Helper\AutoCreate::autoCreateUser($this->username, $this->password, $result);
@@ -160,7 +171,7 @@ class App
 
                 //Get the user id
                 $this->userId = $this->getUserID($username);
-                
+
                 //Update user profile
                 $this->profile->update($result, $this->userId);
 
@@ -183,36 +194,70 @@ class App
 
                     //Redirect to correct url
                     if (is_multisite()) {
-                        $this->sendNoCacheHeader(); 
+                        $this->sendNoCacheHeader();
                         wp_redirect(
-                            apply_filters('adApiWpIntegration/login/subscriberRedirect', 
+                            apply_filters(
+                                'adApiWpIntegration/login/subscriberRedirect',
                                 $this->appendQueryString(network_home_url($referer), 'login', 'true')
                             )
                         );
                         exit;
                     }
-                    
-                    $this->sendNoCacheHeader(); 
+
+                    $this->sendNoCacheHeader();
                     wp_redirect(
-                        apply_filters('adApiWpIntegration/login/subscriberRedirect', 
+                        apply_filters(
+                            'adApiWpIntegration/login/subscriberRedirect',
                             $this->appendQueryString(home_url($referer), 'login', 'true')
                         )
                     );
                     exit;
                 }
 
-                $this->sendNoCacheHeader(); 
+                $this->sendNoCacheHeader();
                 wp_redirect(
-                    apply_filters('adApiWpIntegration/login/defaultRedirect',
+                    apply_filters(
+                        'adApiWpIntegration/login/defaultRedirect',
                         $this->appendQueryString(admin_url("?auth=active-directory"), 'login', 'true')
                     )
                 );
                 exit;
             }
         }
-        
     }
 
+    /**
+     * Escapes leading and trailing spaces from a string
+     *
+     * @param string $string
+     * @return void
+     */
+    private function escapeLeadingAndTrailingSpaces($string)
+    {
+        $characterArray = str_split($string);
+
+        foreach ($characterArray as &$value) {
+            if ($value !== ' ') {
+                break;
+            }
+
+            $value = '\\' . $value;
+        }
+
+        $reversedCharacterArray = array_reverse($characterArray);
+
+        foreach ($reversedCharacterArray as &$value) {
+            if ($value !== ' ') {
+                break;
+            }
+
+            $value = '\\' . $value;
+        }
+
+        $escapedString = implode('', array_reverse($reversedCharacterArray));
+
+        return $escapedString;
+    }
 
     /**
      * Get information from the api-service
@@ -235,8 +280,8 @@ class App
             $result = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/current', $data, 'json', array('Content-Type: application/json'));
 
             //Is curl error
-            if(is_wp_error($result)) {
-                return false; 
+            if (is_wp_error($result)) {
+                return false;
             }
 
             //Is json error
@@ -264,8 +309,8 @@ class App
      */
     private function validateLogin($data, $username)
     {
-        if(!is_object($data)) {
-            return false; 
+        if (!is_object($data)) {
+            return false;
         }
 
         if (isset($data->error)) {
@@ -306,7 +351,7 @@ class App
         }
 
         //Filter secure cookie
-        $secureCookie = apply_filters( 'secure_signon_cookie', $secureCookie, $credentials );
+        $secureCookie = apply_filters('secure_signon_cookie', $secureCookie, $credentials);
 
         //Pass it on as a global
         global $auth_secure_cookie;
@@ -343,7 +388,8 @@ class App
     /**
      * Send nocache header
      */
-    private function sendNoCacheHeader() {
+    private function sendNoCacheHeader()
+    {
         header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
         header("Cache-Control: post-check=0, pre-check=0", false);
         header("Pragma: no-cache");
@@ -357,13 +403,14 @@ class App
      * @param string $queryValue
      * @return string
      */
-    private function appendQueryString($url, $queryParameter, $queryValue) {
-        if(strpos($url,'?') !== false) {
+    private function appendQueryString($url, $queryParameter, $queryValue)
+    {
+        if (strpos($url, '?') !== false) {
             $url .= '&' .$queryParameter. '=' .$queryValue;
         } else {
             $url .= '?' .$queryParameter. '=' .$queryValue;
         }
 
-        return $url; 
+        return $url;
     }
 }
