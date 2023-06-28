@@ -64,7 +64,7 @@ class NewBlog
         if (is_super_admin($userId)) {
             $role = "administrator";
         } else {
-            $role = $this->defaultRole;
+            $role = $this->defaultRole ? $this->defaultRole : 'subscriber';
         }
 
         //Check that user id is a valid int
@@ -77,7 +77,13 @@ class NewBlog
             if (is_user_member_of_blog($userId, $blogId) === true) {
                 return false;
             }
-            add_user_to_blog($blogId, $userId, $role);
+
+            try {
+                add_user_to_blog($blogId, $userId, $role);
+            } catch (\Exception $e) {
+                \adApiWpIntegration\Helper\Log::LogStackTrace($e);
+            }
+
             return true;
         }
 
@@ -87,7 +93,12 @@ class NewBlog
                 if (is_user_member_of_blog($userId, $site->blog_id) === true) {
                     continue;
                 }
-                add_user_to_blog($site->blog_id, $userId, $role);
+
+                try {
+                    add_user_to_blog($site->blog_id, $userId, $role);
+                } catch (\Exception $e) {
+                    \adApiWpIntegration\Helper\Log::LogStackTrace($e);
+                }
             }
         }
 

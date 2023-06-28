@@ -17,7 +17,7 @@ class AutoCreate
                 array(
                     'user_login' => $username,
                     'user_pass' => $password,
-                    'role' =>  $defaultRole
+                    'role' =>  $defaultRole ? $defaultRole : 'subscriber'
                 )
             );
           }
@@ -30,6 +30,7 @@ class AutoCreate
 
         } catch (\Exception $e) {
             error_log("Error: Could not create a new user using bulk data (ad-api-integration).");
+            \adApiWpIntegration\Helper\Log::LogStackTrace($e);
         }
     }
 }
