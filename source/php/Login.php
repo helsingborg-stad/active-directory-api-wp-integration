@@ -4,7 +4,6 @@ namespace adApiWpIntegration;
 
 class Login
 {
-
     /**
      * Hook nonce validation
      * @return void
@@ -21,35 +20,25 @@ class Login
      */
     public function renderNonce()
     {
-        echo '<input type="hidden" name="_ad_nonce" value="' .$this->generateFakeNonce(). '"/>';
+        wp_nonce_field(
+            "validate_active_directory_nonce", 
+            "_ad_nonce"
+        );
     }
 
     /**
      * Check the nonce before running login procedure, must use a hook lower than 20 (ad hijack).
      * @return void / bool
      */
-    public function validateNonce($username)
+    public function validateNonce($username = "")
     {
         if (isset($_POST) && is_array($_POST) && !empty($_POST)) {
-
             if (isset($_POST['_ad_nonce'])) {
-                if ($_POST['_ad_nonce'] == $this->generateFakeNonce()) {
+                if(wp_verify_nonce($_POST['_ad_nonce'], 'validate_active_directory_nonce')) {
                     return true;
                 }
             }
-
             wp_die(__("Could not verify this logins origin. <a href='/wp-login.php'>Please try again.</a>", 'adintegration'));
         }
-    }
-
-    /**
-     * Generate fake nonce.
-     * This is fake due to that the internal nonce function in wordpress is dependent on "logged in / logged out" state.
-     * We have intentionally not used WordPress native nonce function.
-     * @return string
-     */
-    public function generateFakeNonce()
-    {
-        return md5(NONCE_KEY."ad".date("Ymd"));
     }
 }
