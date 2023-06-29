@@ -12,6 +12,18 @@ class Login
     {
         add_action('login_form', array($this, 'renderNonce'), 15);
         add_action('wp_authenticate', array($this, 'validateNonce'), 15); // Ad login priority = 20
+        add_filter('litespeed_esi_nonces', array($this, 'addEsiNonce'));
+    }
+
+    /**
+     * Add nonce field to litespeed nonce esi handler
+     * @return array
+     */
+    public function addEsiNonce($nonces) {
+        if(is_array($nonces)) {
+            $nonces[] = "_ad_nonce"; 
+        }
+        return $nonces; 
     }
 
     /**
