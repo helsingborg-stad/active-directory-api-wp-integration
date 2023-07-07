@@ -2,7 +2,7 @@
 
 namespace adApiWpIntegration;
 
-class Login
+class LoginNonce
 {
     /**
      * Hook nonce validation
@@ -10,6 +10,11 @@ class Login
      */
     public function __construct()
     {
+        //Define AD_NONCE_VALIDATION to false to disable validation
+        if(defined('AD_NONCE_VALIDATION') && AD_NONCE_VALIDATION === false) {
+            return false;
+        }
+
         add_action('login_form', array($this, 'renderNonce'), 15);
         add_action('wp_authenticate', array($this, 'validateNonce'), 15); // Ad login priority = 20
         add_filter('litespeed_esi_nonces', array($this, 'addEsiNonce'));

@@ -36,7 +36,8 @@ $loader->register();
 //Run plugin
 new adApiWpIntegration\Database(); // Database normalization
 new adApiWpIntegration\App(); //Init
-new adApiWpIntegration\Login(); // Nonce sec
+new adApiWpIntegration\LoginNonce(); // Nonce sec
+new adApiWpIntegration\LoginHoneyPot(); // Nonce sec
 new adApiWpIntegration\Password(); //Do not allow ad-users to change their passwords
 new adApiWpIntegration\Admin(); // Sends admin panel errors & information
 new adApiWpIntegration\BulkImport(); // Import user accounts in bulk

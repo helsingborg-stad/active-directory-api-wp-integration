@@ -31,6 +31,8 @@ Remove user capabilitys that are empty: https://site.dev/wp-admin/?adcleancap
 - AD_SAVE_PASSWORD: Wheter to save the ad-password (true) in WordPress. *
 - AD_RANDOM_PASSWORD: Block random password generator. *
 - AD_USER_DOMAIN: Define a domain that belongs to ad-users (to block password reset). *
+- AD_HP_VALIDATION: Define to false to disable honeypot login protection.
+- AD_NONCE_VALIDATION: Define to false to disable nonce login protection.
 
 # Options Bulk Import (Define Constants)
 These options imports all users avabile in active directory nightly. 
@@ -49,7 +51,7 @@ These options creates a user on the site if it exists in active directory on sig
 - AD_AUTOCREATE_ROLE: Default role to assign new users (default to "subscriber")
 
 * Be careful setting these options. All of them are not compatible. For instance: You cannot save the password, and generate a random password.
-** Ad upodate meta should be set in order to enable ad_meta_prefix constant. 
+** Ad update meta should be set in order to enable ad_meta_prefix constant. 
 
 
 # Filters 
@@ -60,7 +62,7 @@ add_filter('adApiWpIntegration/profile/metaKey', function($meta_key){
 }); 
 ```
 
-Filter the default redirect to page, subscribers may not beaffected to this (to homepage as default)
+Filter the default redirect to page, subscribers may not be affected to this (to homepage as default)
 ```php
 add_filter('adApiWpIntegration/login/defaultRedirect', function(){
     return home_url();
