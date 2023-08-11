@@ -85,17 +85,19 @@ class Admin
         }
 
         //Display error message (not valid url)
-        if (filter_var(AD_INTEGRATION_URL, FILTER_VALIDATE_URL) === false) {
+        if (defined('AD_INTEGRATION_URL') && filter_var(AD_INTEGRATION_URL, FILTER_VALIDATE_URL) === false) {
             $this->storeMessage(__("The AD_INTEGRATION_URL provided is not a properly formatted url (should be with https:// and pointing at the base directory of the api).", 'adintegration'));
         }
 
         //Both cannot be active
-        if (AD_RANDOM_PASSWORD === true && AD_SAVE_PASSWORD === true) {
-            $this->storeMessage(__("The AD_RANDOM_PASSWORD and AD_SAVE_PASSWORD constants cannot be true at the same time.", 'adintegration'));
+        if(defined('AD_RANDOM_PASSWORD') && defined('AD_SAVE_PASSWORD')) {
+            if (AD_RANDOM_PASSWORD === true && AD_SAVE_PASSWORD === true) {
+                $this->storeMessage(__("The AD_RANDOM_PASSWORD and AD_SAVE_PASSWORD constants cannot be true at the same time.", 'adintegration'));
+            }
         }
 
         //Bulk import
-        if (AD_BULK_IMPORT === true && (!defined('AD_BULK_IMPORT_USER')||!defined('AD_BULK_IMPORT_PASSWORD'))) {
+        if (defined('AD_BULK_IMPORT') && AD_BULK_IMPORT === true && (!defined('AD_BULK_IMPORT_USER')||!defined('AD_BULK_IMPORT_PASSWORD'))) {
             $this->storeMessage(__("The AD_BULK_IMPORT is defined but AD_BULK_IMPORT_USER and/or AD_BULK_IMPORT_PASSWORD is not. This is required to enable bulkimport.", 'adintegration'));
         }
 
