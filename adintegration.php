@@ -24,14 +24,10 @@ load_plugin_textdomain('adintegration', false, plugin_basename(dirname(__FILE__)
 //Constants
 define('ADAPIWPINTEGRATION_PATH', plugin_dir_path(__FILE__));
 
-//Autoloader
-require_once ADAPIWPINTEGRATION_PATH . 'source/php/Vendor/Psr4ClassLoader.php';
-
-// Instantiate and register the autoloader
-$loader = new adApiWpIntegration\Vendor\Psr4ClassLoader();
-$loader->addPrefix('adApiWpIntegration', ADAPIWPINTEGRATION_PATH);
-$loader->addPrefix('adApiWpIntegration', ADAPIWPINTEGRATION_PATH . 'source/php/');
-$loader->register();
+// Autoload from plugin
+if (file_exists(ADAPIWPINTEGRATION_PATH . 'vendor/autoload.php')) {
+    require_once ADAPIWPINTEGRATION_PATH . 'vendor/autoload.php';
+}
 
 //Run plugin
 new adApiWpIntegration\Database(); // Database normalization
