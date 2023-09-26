@@ -1,21 +1,20 @@
 {
-  "name": "adintegration",
-  "version": "1.0.0",
-  "description": "Integration with the simple active directory api service",
-  "main": "",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Svanmark/Wordpress-Plugin-Boilerplate.git"
-  },
-  "author": "Sebastian Thulin",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Svanmark/Wordpress-Plugin-Boilerplate/issues"
-  },
-  "homepage": "https://github.com/Svanmark/Wordpress-Plugin-Boilerplate",
-  "devDependencies": {
-  }
+    "name": "adintegration",
+    "version": "3.0.0",
+    "description": "Integration with the simple active directory api service",
+    "main": "",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Svanmark/Wordpress-Plugin-Boilerplate.git"
+    },
+    "author": "Sebastian Thulin",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/Svanmark/Wordpress-Plugin-Boilerplate/issues"
+    },
+    "homepage": "https://github.com/Svanmark/Wordpress-Plugin-Boilerplate",
+    "devDependencies": []
 }

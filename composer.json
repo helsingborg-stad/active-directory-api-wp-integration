@@ -9,10 +9,11 @@
             "email": "sebastian.thulin@helsingborg.se"
         }
     ],
-    "require": {},
+    "require": [],
     "autoload": {
         "psr-4": {
-          "adApiWpIntegration\\": "source/php/"
+            "adApiWpIntegration\\": "source/php/"
         }
-    }
+    },
+    "version": "3.0.0"
 }
