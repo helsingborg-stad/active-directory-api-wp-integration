@@ -4,6 +4,7 @@
     "description": "Integration with the simple active directory api service",
     "main": "",
     "scripts": {
+        "build": "", 
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
