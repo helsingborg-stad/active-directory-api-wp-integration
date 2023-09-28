@@ -1,10 +1,10 @@
 {
     "name": "adintegration",
-    "version": "3.0.2",
+    "version": "3.0.3",
     "description": "Integration with the simple active directory api service",
     "main": "",
     "scripts": {
-        "build": "", 
+        "build": "",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
