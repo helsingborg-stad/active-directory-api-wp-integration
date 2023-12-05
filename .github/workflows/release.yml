@@ -50,6 +50,7 @@ jobs:
         run: gulp
       - name: Create assets zip
         uses: thedoctor0/zip-release@0.7.5
+        if: ${{ hashFiles('dist/') != '' }}
         with:
           type: zip
           filename: '../assets.zip'
