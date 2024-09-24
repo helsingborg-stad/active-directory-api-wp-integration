@@ -8,7 +8,7 @@ if (php_sapi_name() !== 'cli') {
 /* Parameters: 
  --no-composer      Does not install vendors. Just create the autoloader.
  --cleanup          Remove removeables. 
- --allow-gulp       Allow gulp to be used. 
+ --install-npm      Install NPM package instead
 */
 
 // Any command needed to run and build plugin assets when newly cheched out of repo.
@@ -26,9 +26,23 @@ if(file_exists('composer.json')) {
 
 //Run npm if package.json is found
 if(file_exists('package.json') && file_exists('package-lock.json')) {
-    $buildCommands[] = 'npm ci --no-progress --no-audit';
+    if(is_array($argv) && !in_array('--install-npm', $argv)) {
+        $buildCommands[] = 'npm ci --no-progress --no-audit';
+    } else {
+        $npmPackage = json_decode(file_get_contents('package.json'));
+        $buildCommands[] = "npm install $npmPackage->name";
+        $buildCommands[] = "rm -rf ./dist";
+        $buildCommands[] = "mv node_modules/$npmPackage->name/dist ./";
+    }
 } elseif(file_exists('package.json') && !file_exists('package-lock.json')) {
-    $buildCommands[] = 'npm install --no-progress --no-audit';
+    if(is_array($argv) && !in_array('--install-npm', $argv)) {
+        $buildCommands[] = 'npm install --no-progress --no-audit';
+    } else {
+        $npmPackage = json_decode(file_get_contents('package.json'));
+        $buildCommands[] = "npm install $npmPackage->name";
+        $buildCommands[] = "rm -rf ./dist";
+        $buildCommands[] = "mv node_modules/$npmPackage->name/dist ./";
+    }
 }
 
 // Files and directories not suitable for prod to be removed.
@@ -47,7 +61,6 @@ $removables = [
     'package.json',
     'phpunit.xml.dist',
     'README.md',
-    'gulpfile.js',
     './node_modules/',
     './source/sass/',
     './source/js/',
