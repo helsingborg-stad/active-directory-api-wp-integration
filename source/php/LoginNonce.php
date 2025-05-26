@@ -2,16 +2,17 @@
 
 namespace adApiWpIntegration;
 
+use adApiWpIntegration\Input;
 class LoginNonce
 {
     /**
      * Hook nonce validation
      * @return void
      */
-    public function __construct()
+    public function __construct(private Input $input)
     {
         //Define AD_NONCE_VALIDATION to false to disable validation
-        if(defined('AD_NONCE_VALIDATION') && AD_NONCE_VALIDATION === false) {
+        if(defined('AD_NONCE_VALIDATION') && constant('AD_NONCE_VALIDATION') === false) {
             return false;
         }
 
@@ -49,11 +50,10 @@ class LoginNonce
      */
     public function validateNonce($username = "")
     {
-        if (isset($_POST) && is_array($_POST) && !empty($_POST)) {
-            if (isset($_POST['_ad_nonce'])) {
-                if(wp_verify_nonce($_POST['_ad_nonce'], 'validate_active_directory_nonce')) {
-                    return true;
-                }
+        $nonce = $this->input->post('_ad_nonce');
+        if ($nonce !== null) {
+            if(wp_verify_nonce($nonce, 'validate_active_directory_nonce')) {
+                return true;
             }
             wp_die(__("Could not verify this logins origin. <a href='/wp-login.php'>Please try again.</a>", 'adintegration'));
         }

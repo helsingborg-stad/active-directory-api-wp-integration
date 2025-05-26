@@ -2,6 +2,7 @@
 
 namespace adApiWpIntegration;
 
+use adApiWpIntegration\Input;
 /**
  * Bulk importing
  * Class for bulk import if users. This class only handles the syncronisation of user accounts.
@@ -11,8 +12,6 @@ namespace adApiWpIntegration;
 
 class BulkImport
 {
-
-    private $index;
     private $defaultRole;
     private $curl;
     private $response;
@@ -28,7 +27,7 @@ class BulkImport
      * Prevents password for being reset
      * @return void
      */
-    public function __construct()
+    public function __construct(private Input $input)
     {
         //Do not run if not all requirements are set.
         if ($this->bulkEnabled() === false) {
@@ -66,7 +65,7 @@ class BulkImport
 
         //Manually test functionality
         add_action('admin_init', function () {
-            if (isset($_GET['adbulkimport'])) {
+            if ($this->input->get('adbulkimport') !== null) {
 
                 //Define as cron
                 define('DOING_CRON', true);
@@ -83,7 +82,7 @@ class BulkImport
 
         //Manually test update profiles cron
         add_action('admin_init', function () {
-            if (isset($_GET['adbulkprofile'])) {
+            if ($this->input->get('adbulkprofile')) {
                 define('DOING_CRON', true);
 
                 //Increase memory and runtime
@@ -104,7 +103,7 @@ class BulkImport
 
         //Manually propagate all users
         add_action('admin_init', function () {
-            if (isset($_GET['adbulkpropagate']) && AD_BULK_IMPORT_PROPAGATE) {
+            if ($this->input->get('adbulkpropagate') && constant('AD_BULK_IMPORT_PROPAGATE')) {
 
                 //Define as cron
                 define('DOING_CRON', true);
@@ -171,22 +170,26 @@ class BulkImport
         $deleteAccounts = $this->diffUserAccounts(false);
 
         //Sanity check, many users to remove?
-        $maxDeleteLimit = isset($_GET['maxDeletelimit']) ? (int) $_GET['maxDeletelimit'] : 1000;
+        $maxDeleteLimit = $this->input->get('maxDeletelimit') !== null ? (int) $this->input->get('maxDeletelimit') : 1000;
 
         if (count($deleteAccounts) > $maxDeleteLimit) {
             if (is_main_site()) {
                 if (get_transient('ad_api_too_many_deletions') !== 1) {
 
+                    $url = admin_url(
+                        '?adbulkimport&maxDeleteLimit=' . $maxDeleteLimit
+                    );
+
                     //Send mail
                     wp_mail(
                         get_option('admin_email'),
                         "Ad-integration plugin",
-                        __("To many user deletions in queue (" . count($deleteAccounts) . "/" . $maxDeleteLimit . ") add https://test.dev/wp-admin/?adbulkimport&maxDeleteLimit=100 to your query to allow number of required deletions.",
+                        __("To many user deletions in queue (" . count($deleteAccounts) . "/" . $maxDeleteLimit . ") add ". $url ." to your query to allow number of required deletions.",
                             "adintegration")
                     );
 
                     //Write to log
-                    error_log("Ad-integration plugin: To many user deletions in queue (" . count($deleteAccounts) . "/" . $maxDeleteLimit . ") add https://test.dev/wp-admin/?adbulkimport&maxDeleteLimit=100 to your query to allow number of required deletions.");
+                    error_log("Ad-integration plugin: To many user deletions in queue (" . count($deleteAccounts) . "/" . $maxDeleteLimit . ") add ". $url ." to your query to allow number of required deletions.");
 
                     //Prevent this mail for 24 hours
                     set_transient('ad_api_too_many_deletions', 1, 23 * HOUR_IN_SECONDS);
@@ -259,12 +262,12 @@ class BulkImport
     {
         //Authentication
         $data = array(
-            'username' => AD_BULK_IMPORT_USER,
-            'password' => AD_BULK_IMPORT_PASSWORD
+            'username' => constant('AD_BULK_IMPORT_USER'),
+            'password' => constant('AD_BULK_IMPORT_PASSWORD')
         );
 
         //Fetch index
-        $index = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/index', $data, 'json',
+        $index = $this->curl->request('POST', rtrim(constant('AD_INTEGRATION_URL'), "/") . '/user/index', $data, 'json',
             array('Content-Type: application/json'));
 
         //Validate json response
@@ -502,7 +505,9 @@ class BulkImport
         }
 
         if (!is_object($this->profile)) {
-            $this->profile = new Profile();
+            $this->profile = new Profile(
+                $this->input
+            );
         }
 
         //Include required resources
@@ -510,13 +515,13 @@ class BulkImport
 
         //Authentication
         $data = array(
-            'username' => AD_BULK_IMPORT_USER,
-            'password' => AD_BULK_IMPORT_PASSWORD
+            'username' => constant('AD_BULK_IMPORT_USER'),
+            'password' => constant('AD_BULK_IMPORT_PASSWORD')
         );
 
         //Fetch user profiles
         $userDataArray = $this->curl->request('POST',
-            rtrim(AD_INTEGRATION_URL, "/") . '/user/get/' . implode("/", $userNames) . "/", $data, 'json',
+            rtrim(constant('AD_INTEGRATION_URL'), "/") . '/user/get/' . implode("/", $userNames) . "/", $data, 'json',
             array('Content-Type: application/json'));
 
         //Validate json response

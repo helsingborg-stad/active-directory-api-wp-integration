@@ -29,13 +29,16 @@ if (file_exists(ADAPIWPINTEGRATION_PATH . 'vendor/autoload.php')) {
     require_once ADAPIWPINTEGRATION_PATH . 'vendor/autoload.php';
 }
 
+//Input sanitazion
+$input = new adApiWpIntegration\Input();
+
 //Run plugin
 new adApiWpIntegration\Database(); // Database normalization
-new adApiWpIntegration\App(); //Init
-new adApiWpIntegration\LoginNonce(); // Nonce sec
-new adApiWpIntegration\LoginHoneyPot(); // Nonce sec
+new adApiWpIntegration\App($input); //Init
+new adApiWpIntegration\LoginNonce($input); // Nonce sec
+new adApiWpIntegration\LoginHoneyPot($input); // Nonce sec
 new adApiWpIntegration\Password(); //Do not allow ad-users to change their passwords
 new adApiWpIntegration\Admin(); // Sends admin panel errors & information
-new adApiWpIntegration\BulkImport(); // Import user accounts in bulk
+new adApiWpIntegration\BulkImport($input); // Import user accounts in bulk
 new adApiWpIntegration\NewBlog(); // Propagate users if new blog is created
-new adApiWpIntegration\Cleaning(); // Cleaning actions
+new adApiWpIntegration\Cleaning($input); // Cleaning actions

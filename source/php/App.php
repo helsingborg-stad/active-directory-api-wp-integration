@@ -2,18 +2,20 @@
 
 namespace adApiWpIntegration;
 
+use adApiWpIntegration\Input;
 class App
 {
     private $curl;
     private $username;
     private $password;
     private $userId;
+    private $profile;
 
     /**
      * Init plugin with construct, only if constant is set and valid
      * @return void
      */
-    public function __construct()
+    public function __construct(private Input $input)
     {
 
         //Do not run if undefined
@@ -21,8 +23,10 @@ class App
             return false;
         }
 
+
+
         //Do not run if not an url
-        if (filter_var(AD_INTEGRATION_URL, FILTER_VALIDATE_URL) === false) {
+        if (filter_var(constant('AD_INTEGRATION_URL'), FILTER_VALIDATE_URL) === false) {
             return false;
         }
 
@@ -122,14 +126,19 @@ class App
      */
     public function hijackLogin($username)
     {
+        //Escape username
+        $username = sanitize_text_field(trim($username));
+
         //Translate email login to username
         if (is_email($username)) {
-            $username = $this->emailToUsername($username);
+            $username = $this->emailToUsername(
+                filter_var($username, FILTER_SANITIZE_EMAIL)
+            );
         }
 
         //Store to class
         $this->username = $username;
-        $this->password = isset($_POST['pwd']) ? $_POST['pwd'] : "";
+        $this->password = $this->input->get('pwd');
 
         //Only assume thre's a existing user id if autocreate is off
         if (!defined('AD_AUTOCREATE_USER') || (defined('AD_AUTOCREATE_USER') && AD_AUTOCREATE_USER === false)) {
@@ -142,7 +151,7 @@ class App
 
         //Init required classes
         $this->curl = new Helper\Curl();
-        $this->profile = new Profile();
+        $this->profile = new Profile($this->input);
 
         // Unescape all characters from password that will be sent to Active Directory
         $unescapedPassword = stripslashes($this->password);
@@ -172,18 +181,14 @@ class App
                 $this->signOn(array(
                     'user_login' => $this->username,
                     'user_password' => $this->password,
-                    'remember' => isset($_POST['rememberme']) && $_POST['rememberme'] == "forever" ? true : false
+                    'remember' => $this->input->get('rememberme') == "forever" ? true : false
                 ));
 
                 //Redirect to admin panel / frontpage
                 if (in_array('subscriber', (array) get_userdata($this->userId)->roles)) {
 
                     //Get bulitin referer
-                    if (isset($_POST['_wp_http_referer'])) {
-                        $referer = $_POST['_wp_http_referer'];
-                    } else {
-                        $referer = "/";
-                    }
+                    $referer = $this->input->get('_wp_http_referer') ?? "/";
 
                     //Redirect to correct url
                     if (is_multisite()) {
@@ -237,7 +242,7 @@ class App
             $response = new Helper\Response();
 
             //Make Curl
-            $result = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/current', $data, 'json', array('Content-Type: application/json'));
+            $result = $this->curl->request('POST', rtrim(constant('AD_INTEGRATION_URL'), "/") . '/user/current', $data, 'json', array('Content-Type: application/json'));
 
             //Is curl error
             if (is_wp_error($result)) {
@@ -332,7 +337,10 @@ class App
 
     /**
      * Translate email to username
-     * @return void
+     * 
+     * @param string|null $email
+     * 
+     * @return string|null
      */
     private function emailToUsername($email = null)
     {
@@ -347,8 +355,10 @@ class App
 
     /**
      * Send nocache header
+     * 
+     * @return void
      */
-    private function sendNoCacheHeader()
+    private function sendNoCacheHeader(): void
     {
         header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
         header("Cache-Control: post-check=0, pre-check=0", false);
@@ -365,10 +375,14 @@ class App
      */
     private function appendQueryString($url, $queryParameter, $queryValue)
     {
+        $url                = esc_url_raw($url);
+        $queryParameter     = sanitize_key($queryParameter);
+        $queryValue         = rawurlencode($queryValue);
+
         if (strpos($url, '?') !== false) {
-            $url .= '&' .$queryParameter. '=' .$queryValue;
+            $url .= '&' . $queryParameter . '=' . $queryValue;
         } else {
-            $url .= '?' .$queryParameter. '=' .$queryValue;
+            $url .= '?' . $queryParameter . '=' . $queryValue;
         }
 
         return $url;
