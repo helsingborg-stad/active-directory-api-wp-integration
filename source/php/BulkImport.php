@@ -176,16 +176,20 @@ class BulkImport
             if (is_main_site()) {
                 if (get_transient('ad_api_too_many_deletions') !== 1) {
 
+                    $url = admin_url(
+                        '?adbulkimport&maxDeleteLimit=' . $maxDeleteLimit
+                    );
+
                     //Send mail
                     wp_mail(
                         get_option('admin_email'),
                         "Ad-integration plugin",
-                        __("To many user deletions in queue (" . count($deleteAccounts) . "/" . $maxDeleteLimit . ") add https://test.dev/wp-admin/?adbulkimport&maxDeleteLimit=100 to your query to allow number of required deletions.",
+                        __("To many user deletions in queue (" . count($deleteAccounts) . "/" . $maxDeleteLimit . ") add ". $url ." to your query to allow number of required deletions.",
                             "adintegration")
                     );
 
                     //Write to log
-                    error_log("Ad-integration plugin: To many user deletions in queue (" . count($deleteAccounts) . "/" . $maxDeleteLimit . ") add https://test.dev/wp-admin/?adbulkimport&maxDeleteLimit=100 to your query to allow number of required deletions.");
+                    error_log("Ad-integration plugin: To many user deletions in queue (" . count($deleteAccounts) . "/" . $maxDeleteLimit . ") add ". $url ." to your query to allow number of required deletions.");
 
                     //Prevent this mail for 24 hours
                     set_transient('ad_api_too_many_deletions', 1, 23 * HOUR_IN_SECONDS);
