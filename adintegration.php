@@ -39,6 +39,6 @@ new adApiWpIntegration\LoginNonce($input); // Nonce sec
 new adApiWpIntegration\LoginHoneyPot($input); // Nonce sec
 new adApiWpIntegration\Password(); //Do not allow ad-users to change their passwords
 new adApiWpIntegration\Admin(); // Sends admin panel errors & information
-new adApiWpIntegration\BulkImport(); // Import user accounts in bulk
+new adApiWpIntegration\BulkImport($input); // Import user accounts in bulk
 new adApiWpIntegration\NewBlog(); // Propagate users if new blog is created
 new adApiWpIntegration\Cleaning($input); // Cleaning actions

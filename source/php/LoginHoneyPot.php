@@ -14,7 +14,7 @@ class LoginHoneyPot
     public function __construct(private Input $input)
     {
         //Define AD_HP_VALIDATION to false to disable validation
-        if(defined('AD_HP_VALIDATION') && AD_HP_VALIDATION === false) {
+        if(defined('AD_HP_VALIDATION') && constant('AD_HP_VALIDATION') === false) {
             return false;
         }
 

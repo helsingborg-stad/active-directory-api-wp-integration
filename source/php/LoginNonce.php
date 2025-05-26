@@ -12,7 +12,7 @@ class LoginNonce
     public function __construct(private Input $input)
     {
         //Define AD_NONCE_VALIDATION to false to disable validation
-        if(defined('AD_NONCE_VALIDATION') && AD_NONCE_VALIDATION === false) {
+        if(defined('AD_NONCE_VALIDATION') && constant('AD_NONCE_VALIDATION') === false) {
             return false;
         }
 

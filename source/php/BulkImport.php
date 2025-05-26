@@ -103,7 +103,7 @@ class BulkImport
 
         //Manually propagate all users
         add_action('admin_init', function () {
-            if ($this->input->get('adbulkpropagate') && AD_BULK_IMPORT_PROPAGATE) {
+            if ($this->input->get('adbulkpropagate') && constant('AD_BULK_IMPORT_PROPAGATE')) {
 
                 //Define as cron
                 define('DOING_CRON', true);
@@ -262,12 +262,12 @@ class BulkImport
     {
         //Authentication
         $data = array(
-            'username' => AD_BULK_IMPORT_USER,
-            'password' => AD_BULK_IMPORT_PASSWORD
+            'username' => constant('AD_BULK_IMPORT_USER'),
+            'password' => constant('AD_BULK_IMPORT_PASSWORD')
         );
 
         //Fetch index
-        $index = $this->curl->request('POST', rtrim(AD_INTEGRATION_URL, "/") . '/user/index', $data, 'json',
+        $index = $this->curl->request('POST', rtrim(constant('AD_INTEGRATION_URL'), "/") . '/user/index', $data, 'json',
             array('Content-Type: application/json'));
 
         //Validate json response
@@ -505,7 +505,9 @@ class BulkImport
         }
 
         if (!is_object($this->profile)) {
-            $this->profile = new Profile();
+            $this->profile = new Profile(
+                $this->input
+            );
         }
 
         //Include required resources
@@ -513,13 +515,13 @@ class BulkImport
 
         //Authentication
         $data = array(
-            'username' => AD_BULK_IMPORT_USER,
-            'password' => AD_BULK_IMPORT_PASSWORD
+            'username' => constant('AD_BULK_IMPORT_USER'),
+            'password' => constant('AD_BULK_IMPORT_PASSWORD')
         );
 
         //Fetch user profiles
         $userDataArray = $this->curl->request('POST',
-            rtrim(AD_INTEGRATION_URL, "/") . '/user/get/' . implode("/", $userNames) . "/", $data, 'json',
+            rtrim(constant('AD_INTEGRATION_URL'), "/") . '/user/get/' . implode("/", $userNames) . "/", $data, 'json',
             array('Content-Type: application/json'));
 
         //Validate json response
