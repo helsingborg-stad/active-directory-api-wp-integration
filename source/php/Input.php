@@ -5,20 +5,21 @@ namespace adApiWpIntegration;
 class Input
 {
   private $postVars = array(
-    'username' => null,
-    'password' => null,
+    'pwd' => null,
     'rememberme' => null,
     '_wp_http_referer' => null,
-    '_wpnonce' => null,
-    'pwd' => null
+    '_ad_nonce' => null,
+    '_wpnonce' => null
   );
 
   private $getVars = array(
-    'action' => null,
-    'redirect_to' => null,
-    'error' => null,
-    'login' => null,
-    'loggedout' => null
+    'adbulkimport' => null,
+    'adbulkprofile' => null,
+    'adbulkpropagate' => null,
+    'maxDeletelimit' => null,
+    'adcleanusers' => null,
+    'adcleanmeta' => null,
+    'adcleancap' => null
   );
 
   public function __construct()

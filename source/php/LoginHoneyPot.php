@@ -63,7 +63,7 @@ class LoginHoneyPot
      */
     public function validateHoneyPot($username = "")
     {
-        $honeyPotValue = $this->input->post($this->fieldName);
+        $honeyPotValue = isset($_POST[$this->fieldName]) ? sanitize_text_field($_POST[$this->fieldName]) : null;
         if ($honeyPotValue !== null) {
             if($honeyPotValue == $this->fieldMinTime) {
                 return true;
