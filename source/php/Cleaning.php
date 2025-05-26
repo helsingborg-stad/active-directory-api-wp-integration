@@ -2,6 +2,7 @@
 
 namespace adApiWpIntegration;
 
+use adApiWpIntegration\Input;
 /**
  * Cleaing functionality
  * Due to some dumb cahing behaviour, wordpress creates scappy data. Clean that away.
@@ -11,7 +12,7 @@ class Cleaning
 {
     private $db;
 
-    public function __construct()
+    public function __construct(private Input $input)
     {
 
         //Globals
@@ -44,17 +45,18 @@ class Cleaning
     public function manualActions()
     {
         add_action('admin_init', function () {
-            if (isset($_GET['adcleanusers'])) {
+
+            if ($this->input->get('adcleanusers') !== null) {
                 $this->removeDuplicateUsers();
                 wp_die("Removed duplicate users.");
             }
 
-            if (isset($_GET['adcleanmeta'])) {
+            if ($this->input->get('adcleanmeta') !== null) {
                 $this->removeOphanUserMeta();
                 wp_die("Removed orphan meta.");
             }
 
-            if (isset($_GET['adcleancap'])) {
+            if ($this->input->get('adcleancap') !== null) {
                 $this->removeEmptyCapabilities();
                 wp_die("Removed empty capabilities.");
             }

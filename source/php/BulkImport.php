@@ -2,6 +2,7 @@
 
 namespace adApiWpIntegration;
 
+use adApiWpIntegration\Input;
 /**
  * Bulk importing
  * Class for bulk import if users. This class only handles the syncronisation of user accounts.
@@ -11,8 +12,6 @@ namespace adApiWpIntegration;
 
 class BulkImport
 {
-
-    private $index;
     private $defaultRole;
     private $curl;
     private $response;
@@ -28,7 +27,7 @@ class BulkImport
      * Prevents password for being reset
      * @return void
      */
-    public function __construct()
+    public function __construct(private Input $input)
     {
         //Do not run if not all requirements are set.
         if ($this->bulkEnabled() === false) {
@@ -66,7 +65,7 @@ class BulkImport
 
         //Manually test functionality
         add_action('admin_init', function () {
-            if (isset($_GET['adbulkimport'])) {
+            if ($this->input->get('adbulkimport') !== null) {
 
                 //Define as cron
                 define('DOING_CRON', true);
@@ -83,7 +82,7 @@ class BulkImport
 
         //Manually test update profiles cron
         add_action('admin_init', function () {
-            if (isset($_GET['adbulkprofile'])) {
+            if ($this->input->get('adbulkprofile')) {
                 define('DOING_CRON', true);
 
                 //Increase memory and runtime
@@ -104,7 +103,7 @@ class BulkImport
 
         //Manually propagate all users
         add_action('admin_init', function () {
-            if (isset($_GET['adbulkpropagate']) && AD_BULK_IMPORT_PROPAGATE) {
+            if ($this->input->get('adbulkpropagate') && AD_BULK_IMPORT_PROPAGATE) {
 
                 //Define as cron
                 define('DOING_CRON', true);
@@ -171,7 +170,7 @@ class BulkImport
         $deleteAccounts = $this->diffUserAccounts(false);
 
         //Sanity check, many users to remove?
-        $maxDeleteLimit = isset($_GET['maxDeletelimit']) ? (int) $_GET['maxDeletelimit'] : 1000;
+        $maxDeleteLimit = $this->input->get('maxDeletelimit') !== null ? (int) $this->input->get('maxDeletelimit') : 1000;
 
         if (count($deleteAccounts) > $maxDeleteLimit) {
             if (is_main_site()) {

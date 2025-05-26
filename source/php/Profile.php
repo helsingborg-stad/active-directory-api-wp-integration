@@ -2,11 +2,13 @@
 
 namespace adApiWpIntegration;
 
+use adApiWpIntegration\Input;
+
 class Profile
 {
     public $format = null;
 
-    public function __construct()
+    public function __construct(private Input $input)
     {
         if (is_null($this->format)) {
             $this->format = new Helper\Format();
@@ -40,10 +42,12 @@ class Profile
         if ($updatePassword === true) {
             // Get user object
             $user = get_user_by('ID', $user_id);
-            if ($user && !AD_RANDOM_PASSWORD && AD_SAVE_PASSWORD && isset($_POST['pwd']) && !empty($_POST['pwd'])) {
+            $submitPassword = $this->input->post('pwd');
+
+            if ($user && !AD_RANDOM_PASSWORD && AD_SAVE_PASSWORD && $submitPassword && !empty($submitPassword)) {
                 // Update pw if saved pw and input does not match
-                if (!wp_check_password($_POST['pwd'], $user->data->user_pass, $user->ID)) {
-                    $fields['user_pass'] = $_POST['pwd'];
+                if (!wp_check_password($submitPassword, $user->data->user_pass, $user->ID)) {
+                    $fields['user_pass'] = $submitPassword;
                 }
             } elseif (AD_RANDOM_PASSWORD) {
                 $passUpdated = get_user_meta($user_id, 'pass_updated', true);

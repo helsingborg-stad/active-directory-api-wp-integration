@@ -11,7 +11,7 @@ class LoginHoneyPot
      * Hook nonce validation
      * @return void
      */
-    public function __construct()
+    public function __construct(private Input $input)
     {
         //Define AD_HP_VALIDATION to false to disable validation
         if(defined('AD_HP_VALIDATION') && AD_HP_VALIDATION === false) {
@@ -63,11 +63,10 @@ class LoginHoneyPot
      */
     public function validateHoneyPot($username = "")
     {
-        if (isset($_POST) && is_array($_POST) && !empty($_POST)) {
-            if (isset($_POST[$this->fieldName])) {
-                if($_POST[$this->fieldName] == $this->fieldMinTime) {
-                    return true;
-                }
+        $honeyPotValue = $this->input->post($this->fieldName);
+        if ($honeyPotValue !== null) {
+            if($honeyPotValue == $this->fieldMinTime) {
+                return true;
             }
             wp_die(__("Could not verify that you are not a bot. <a href='/wp-login.php'>Please try again.</a>", 'adintegration'));
         }
