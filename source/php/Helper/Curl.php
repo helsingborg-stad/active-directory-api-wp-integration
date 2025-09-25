@@ -2,7 +2,16 @@
 
 namespace adApiWpIntegration\Helper;
 
-class Curl
+use adApiWpIntegration\Contracts\HttpClientInterface;
+
+/**
+ * HTTP client implementation using cURL.
+ * 
+ * This class follows the Single Responsibility Principle by handling only
+ * HTTP requests. It implements the HttpClientInterface to allow for easy
+ * testing and extensibility.
+ */
+class Curl implements HttpClientInterface
 {
     /**
      * Curl request
