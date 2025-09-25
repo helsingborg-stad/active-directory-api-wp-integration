@@ -38,6 +38,11 @@ class Profile
             $fields['user_email'] = strtolower($data->mail);
         }
 
+        //Update companyname (only in municipio theme)
+        if (isset($data->company) && !empty($data->company)) {
+           //TODO: Use helper from Municipio to set company name
+        }
+
         //Update password
         if ($updatePassword === true) {
             // Get user object

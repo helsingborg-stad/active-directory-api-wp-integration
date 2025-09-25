@@ -9,7 +9,9 @@
             "email": "sebastian.thulin@helsingborg.se"
         }
     ],
-    "require": {},
+    "require": {
+        "helsingborg-stad/wpservice": "^2.0"
+    },
     "autoload": {
         "psr-4": {
             "adApiWpIntegration\\": "source/php/"

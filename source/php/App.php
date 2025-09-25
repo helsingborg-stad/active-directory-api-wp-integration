@@ -3,6 +3,8 @@
 namespace adApiWpIntegration;
 
 use adApiWpIntegration\Input;
+use WpService\WpService;
+
 class App
 {
     private $curl;
@@ -15,15 +17,13 @@ class App
      * Init plugin with construct, only if constant is set and valid
      * @return void
      */
-    public function __construct(private Input $input)
+    public function __construct(private Input $input, private WpService $wpService)
     {
 
         //Do not run if undefined
         if (!defined('AD_INTEGRATION_URL')) {
             return false;
         }
-
-
 
         //Do not run if not an url
         if (filter_var(constant('AD_INTEGRATION_URL'), FILTER_VALIDATE_URL) === false) {

@@ -31,10 +31,11 @@ if (file_exists(ADAPIWPINTEGRATION_PATH . 'vendor/autoload.php')) {
 
 //Input sanitazion
 $input = new adApiWpIntegration\Input();
+$wpService = new WpService\Implementations\NativeWpService();
 
 //Run plugin
 new adApiWpIntegration\Database(); // Database normalization
-new adApiWpIntegration\App($input); //Init
+new adApiWpIntegration\App($input, $wpService); //Init
 new adApiWpIntegration\LoginNonce($input); // Nonce sec
 new adApiWpIntegration\LoginHoneyPot($input); // Nonce sec
 new adApiWpIntegration\Password(); //Do not allow ad-users to change their passwords
