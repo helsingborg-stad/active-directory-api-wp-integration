@@ -4,6 +4,7 @@ namespace adApiWpIntegration;
 
 use adApiWpIntegration\Config\ConfigInterface;
 use adApiWpIntegration\Services\LoginService;
+use adApiWpIntegration\Contracts\HookableInterface;
 use WpService\WpService;
 
 /**
@@ -14,14 +15,28 @@ use WpService\WpService;
  * by depending on interfaces rather than concrete implementations. The Dependency
  * Inversion Principle is followed by injecting dependencies rather than creating them.
  */
-class AppRefactored
+class AppRefactored implements HookableInterface
 {
     public function __construct(
         private LoginService $loginService,
         private ConfigInterface $config,
         private WpService $wpService
     ) {
-        $this->initializeApplication();
+        // Hooks are now registered explicitly via addHooks() method
+    }
+
+    /**
+     * Add hooks to WordPress.
+     * 
+     * This method contains all WordPress hook registrations for this service.
+     */
+    public function addHooks(): void
+    {
+        if (!$this->isConfigurationValid()) {
+            return;
+        }
+
+        $this->setupEmailNotifications();
     }
 
     /**

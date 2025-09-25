@@ -4,6 +4,7 @@ namespace adApiWpIntegration\Services;
 
 use adApiWpIntegration\Contracts\InputHandlerInterface;
 use adApiWpIntegration\Config\ConfigInterface;
+use adApiWpIntegration\Contracts\HookableInterface;
 use WpService\WpService;
 
 /**
@@ -13,7 +14,7 @@ use WpService\WpService;
  * nonce validation logic. It implements the Dependency Inversion Principle
  * by depending on abstractions rather than concrete implementations.
  */
-class NonceValidationService
+class NonceValidationService implements HookableInterface
 {
     private const NONCE_ACTION = 'validate_active_directory_nonce';
     private const NONCE_FIELD = '_ad_nonce';
@@ -23,13 +24,15 @@ class NonceValidationService
         private ConfigInterface $config,
         private WpService $wpService
     ) {
-        $this->initializeNonceValidation();
+        // Hooks are now registered explicitly via addHooks() method
     }
 
     /**
-     * Initialize nonce validation if enabled.
+     * Add hooks to WordPress.
+     * 
+     * This method contains all WordPress hook registrations for this service.
      */
-    private function initializeNonceValidation(): void
+    public function addHooks(): void
     {
         if (!$this->config->isNonceValidationEnabled()) {
             return;

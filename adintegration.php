@@ -49,11 +49,20 @@ $container = new ServiceContainer($wpService);
 
 // Bootstrap the refactored application
 $app = $container->get(AppRefactored::class);
+$app->addHooks();
 
 // Initialize security services using the refactored SOLID architecture
+$loginService = $container->get(\adApiWpIntegration\Services\LoginService::class);
+$loginService->addHooks();
+
 $nonceValidation = $container->get(\adApiWpIntegration\Services\NonceValidationService::class);
+$nonceValidation->addHooks();
+
 $honeyPotValidation = $container->get(\adApiWpIntegration\Services\HoneyPotValidationService::class);
+$honeyPotValidation->addHooks();
+
 $passwordManagement = $container->get(\adApiWpIntegration\Services\PasswordManagementService::class);
+$passwordManagement->addHooks();
 
 // Initialize remaining legacy classes (to be refactored in future iterations)
 // These maintain backward compatibility while we incrementally refactor

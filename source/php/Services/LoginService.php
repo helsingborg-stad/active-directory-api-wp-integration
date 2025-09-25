@@ -7,6 +7,7 @@ use adApiWpIntegration\Contracts\UserManagerInterface;
 use adApiWpIntegration\Contracts\RedirectionHandlerInterface;
 use adApiWpIntegration\Contracts\InputHandlerInterface;
 use adApiWpIntegration\Config\ConfigInterface;
+use adApiWpIntegration\Contracts\HookableInterface;
 use WpService\WpService;
 
 /**
@@ -17,7 +18,7 @@ use WpService\WpService;
  * depending on interfaces, allowing for easy extension without modification.
  * It follows the Dependency Inversion Principle by depending on abstractions.
  */
-class LoginService
+class LoginService implements HookableInterface
 {
     public function __construct(
         private AuthenticatorInterface $authenticator,
@@ -27,16 +28,16 @@ class LoginService
         private ConfigInterface $config,
         private WpService $wpService
     ) {
-        $this->initializeLogin();
+        // Hooks are now registered explicitly via addHooks() method
     }
 
     /**
-     * Initialize the login process.
+     * Add hooks to WordPress.
      * 
-     * This method sets up the WordPress authentication hook and validates
-     * the configuration before proceeding.
+     * This method contains all WordPress hook registrations for this service.
+     * It should be called after instantiation to register the hooks.
      */
-    private function initializeLogin(): void
+    public function addHooks(): void
     {
         if (!$this->isConfigurationValid()) {
             return;

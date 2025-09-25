@@ -3,6 +3,7 @@
 namespace adApiWpIntegration\Services;
 
 use adApiWpIntegration\Config\ConfigInterface;
+use adApiWpIntegration\Contracts\HookableInterface;
 use WpService\WpService;
 
 /**
@@ -12,19 +13,21 @@ use WpService\WpService;
  * password management logic for AD users. It implements the Dependency
  * Inversion Principle by depending on abstractions rather than concrete implementations.
  */
-class PasswordManagementService
+class PasswordManagementService implements HookableInterface
 {
     public function __construct(
         private ConfigInterface $config,
         private WpService $wpService
     ) {
-        $this->initializePasswordManagement();
+        // Hooks are now registered explicitly via addHooks() method
     }
 
     /**
-     * Initialize password management filters.
+     * Add hooks to WordPress.
+     * 
+     * This method contains all WordPress hook registrations for this service.
      */
-    private function initializePasswordManagement(): void
+    public function addHooks(): void
     {
         $this->wpService->addFilter('allow_password_reset', [$this, 'denyPasswordReset'], 10, 2);
     }
