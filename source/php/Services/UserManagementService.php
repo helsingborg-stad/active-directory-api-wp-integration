@@ -7,6 +7,7 @@ use adApiWpIntegration\Config\ConfigInterface;
 use adApiWpIntegration\Helper\AutoCreate;
 use adApiWpIntegration\Profile;
 use adApiWpIntegration\Contracts\InputHandlerInterface;
+use WpService\WpService;
 
 /**
  * User management service implementation.
@@ -19,7 +20,8 @@ class UserManagementService implements UserManagerInterface
 {
     public function __construct(
         private ConfigInterface $config,
-        private InputHandlerInterface $inputHandler
+        private InputHandlerInterface $inputHandler,
+        private WpService $wpService
     ) {
     }
 
@@ -28,8 +30,8 @@ class UserManagementService implements UserManagerInterface
      */
     public function getUserId(string $usernameOrEmail): ?int
     {
-        $user = get_user_by(
-            is_email($usernameOrEmail) ? 'email' : 'login',
+        $user = $this->wpService->getUserBy(
+            $this->wpService->isEmail($usernameOrEmail) ? 'email' : 'login',
             $usernameOrEmail
         );
 
@@ -72,7 +74,7 @@ class UserManagementService implements UserManagerInterface
             return null;
         }
 
-        if ($user = get_user_by('email', $email)) {
+        if ($user = $this->wpService->getUserBy('email', $email)) {
             if (isset($user->user_login)) {
                 return $user->user_login;
             }

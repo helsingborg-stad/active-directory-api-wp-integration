@@ -4,7 +4,7 @@ namespace adApiWpIntegration\Services;
 
 use adApiWpIntegration\Contracts\RedirectionHandlerInterface;
 use adApiWpIntegration\Contracts\InputHandlerInterface;
-use WpService\Contracts\ApplyFilters;
+use WpService\WpService;
 
 /**
  * Redirection service implementation.
@@ -16,7 +16,7 @@ use WpService\Contracts\ApplyFilters;
 class RedirectionService implements RedirectionHandlerInterface
 {
     public function __construct(
-        private ApplyFilters $applyFilters,
+        private WpService $wpService,
         private InputHandlerInterface $inputHandler
     ) {
     }
@@ -26,7 +26,7 @@ class RedirectionService implements RedirectionHandlerInterface
      */
     public function handleLoginRedirect(int $userId, string $referer = ''): void
     {
-        $userData = get_userdata($userId);
+        $userData = $this->wpService->getUserdata($userId);
         
         if (!$userData) {
             return;
@@ -59,8 +59,8 @@ class RedirectionService implements RedirectionHandlerInterface
      */
     public function appendQueryString(string $url, string $parameter, string $value): string
     {
-        $url = esc_url_raw($url);
-        $parameter = sanitize_key($parameter);
+        $url = $this->wpService->escUrlRaw($url);
+        $parameter = $this->wpService->sanitizeKey($parameter);
         $value = rawurlencode($value);
 
         if (strpos($url, '?') !== false) {
@@ -79,26 +79,26 @@ class RedirectionService implements RedirectionHandlerInterface
     {
         $referer = $referer ?: $this->inputHandler->get('_wp_http_referer') ?: '/';
 
-        if (is_multisite()) {
+        if ($this->wpService->isMultisite()) {
             $url = $this->appendQueryString(
-                network_home_url($referer),
+                $this->wpService->networkHomeUrl($referer),
                 'login',
                 'true'
             );
         } else {
             $url = $this->appendQueryString(
-                home_url($referer),
+                $this->wpService->homeUrl($referer),
                 'login',
                 'true'
             );
         }
 
-        $redirectUrl = $this->applyFilters->applyFilters(
+        $redirectUrl = $this->wpService->applyFilters(
             'adApiWpIntegration/login/subscriberRedirect',
             $url
         );
 
-        wp_redirect($redirectUrl);
+        $this->wpService->wpRedirect($redirectUrl);
         exit;
     }
 
@@ -108,17 +108,17 @@ class RedirectionService implements RedirectionHandlerInterface
     private function handleDefaultRedirect(): void
     {
         $url = $this->appendQueryString(
-            admin_url("?auth=active-directory"),
+            $this->wpService->adminUrl("?auth=active-directory"),
             'login',
             'true'
         );
 
-        $redirectUrl = $this->applyFilters->applyFilters(
+        $redirectUrl = $this->wpService->applyFilters(
             'adApiWpIntegration/login/defaultRedirect',
             $url
         );
 
-        wp_redirect($redirectUrl);
+        $this->wpService->wpRedirect($redirectUrl);
         exit;
     }
 }

@@ -3,7 +3,7 @@
 namespace adApiWpIntegration\Services;
 
 use adApiWpIntegration\Config\ConfigInterface;
-use WpService\Contracts\AddFilter;
+use WpService\WpService;
 
 /**
  * Password management service implementation.
@@ -16,7 +16,7 @@ class PasswordManagementService
 {
     public function __construct(
         private ConfigInterface $config,
-        private AddFilter $addFilter
+        private WpService $wpService
     ) {
         $this->initializePasswordManagement();
     }
@@ -26,7 +26,7 @@ class PasswordManagementService
      */
     private function initializePasswordManagement(): void
     {
-        $this->addFilter->addFilter('allow_password_reset', [$this, 'denyPasswordReset'], 10, 2);
+        $this->wpService->addFilter('allow_password_reset', [$this, 'denyPasswordReset'], 10, 2);
     }
 
     /**
@@ -50,7 +50,7 @@ class PasswordManagementService
             return $allow;
         }
 
-        $user = get_user_by('id', $userId);
+        $user = $this->wpService->getUserBy('id', $userId);
         if (!$user || !isset($user->user_email)) {
             return $allow;
         }
@@ -71,7 +71,7 @@ class PasswordManagementService
      */
     private function getNetworkDomain(): ?string
     {
-        $url = parse_url(trim(network_site_url(), "/"));
+        $url = parse_url(trim($this->wpService->networkSiteUrl(), "/"));
         
         if (empty($url['host'])) {
             return null;

@@ -4,8 +4,7 @@ namespace adApiWpIntegration\Services;
 
 use adApiWpIntegration\Contracts\InputHandlerInterface;
 use adApiWpIntegration\Config\ConfigInterface;
-use WpService\Contracts\AddAction;
-use WpService\Contracts\AddFilter;
+use WpService\WpService;
 
 /**
  * Nonce validation service implementation.
@@ -22,8 +21,7 @@ class NonceValidationService
     public function __construct(
         private InputHandlerInterface $inputHandler,
         private ConfigInterface $config,
-        private AddAction $addAction,
-        private AddFilter $addFilter
+        private WpService $wpService
     ) {
         $this->initializeNonceValidation();
     }
@@ -37,9 +35,9 @@ class NonceValidationService
             return;
         }
 
-        $this->addAction->addAction('login_form', [$this, 'renderNonce'], 15);
-        $this->addAction->addAction('wp_authenticate', [$this, 'validateNonce'], 15);
-        $this->addFilter->addFilter('litespeed_esi_nonces', [$this, 'addEsiNonce']);
+        $this->wpService->addAction('login_form', [$this, 'renderNonce'], 15);
+        $this->wpService->addAction('wp_authenticate', [$this, 'validateNonce'], 15);
+        $this->wpService->addFilter('litespeed_esi_nonces', [$this, 'addEsiNonce']);
     }
 
     /**
@@ -47,7 +45,7 @@ class NonceValidationService
      */
     public function renderNonce(): void
     {
-        wp_nonce_field(self::NONCE_ACTION, self::NONCE_FIELD);
+        $this->wpService->wpNonceField(self::NONCE_ACTION, self::NONCE_FIELD);
     }
 
     /**
@@ -63,11 +61,11 @@ class NonceValidationService
             return true; // No nonce provided, allow other authentication methods
         }
 
-        if (wp_verify_nonce($nonce, self::NONCE_ACTION)) {
+        if ($this->wpService->wpVerifyNonce($nonce, self::NONCE_ACTION)) {
             return true;
         }
 
-        wp_die(__("Could not verify this logins origin. <a href='/wp-login.php'>Please try again.</a>", 'adintegration'));
+        $this->wpService->wpDie($this->wpService->__("Could not verify this logins origin. <a href='/wp-login.php'>Please try again.</a>", 'adintegration'));
     }
 
     /**

@@ -66,7 +66,6 @@ class ServiceContainer
             return new AuthenticationService(
                 $this->get(HttpClientInterface::class),
                 $this->get(ConfigInterface::class),
-                $this->get(WpService::class),
                 $this->get(WpService::class)
             );
         });
@@ -74,7 +73,8 @@ class ServiceContainer
         $this->registerSingleton(UserManagerInterface::class, function () {
             return new UserManagementService(
                 $this->get(ConfigInterface::class),
-                $this->get(InputHandlerInterface::class)
+                $this->get(InputHandlerInterface::class),
+                $this->get(WpService::class)
             );
         });
 
@@ -101,7 +101,6 @@ class ServiceContainer
             return new \adApiWpIntegration\Services\NonceValidationService(
                 $this->get(InputHandlerInterface::class),
                 $this->get(ConfigInterface::class),
-                $this->get(WpService::class),
                 $this->get(WpService::class)
             );
         });

@@ -6,8 +6,7 @@ use adApiWpIntegration\Contracts\AuthenticatorInterface;
 use adApiWpIntegration\Contracts\HttpClientInterface;
 use adApiWpIntegration\Config\ConfigInterface;
 use adApiWpIntegration\Helper\Response;
-use WpService\Contracts\ApplyFilters;
-use WpService\Contracts\DoAction;
+use WpService\WpService;
 
 /**
  * Authentication service implementation.
@@ -21,8 +20,7 @@ class AuthenticationService implements AuthenticatorInterface
     public function __construct(
         private HttpClientInterface $httpClient,
         private ConfigInterface $config,
-        private ApplyFilters $applyFilters,
-        private DoAction $doAction
+        private WpService $wpService
     ) {
     }
 
@@ -71,7 +69,7 @@ class AuthenticationService implements AuthenticatorInterface
             ['Content-Type: application/json']
         );
 
-        if (is_wp_error($result)) {
+        if ($this->wpService->isWpError($result)) {
             return null;
         }
 
@@ -93,22 +91,22 @@ class AuthenticationService implements AuthenticatorInterface
      */
     public function signOn(array $credentials): void
     {
-        $secureCookie = $this->applyFilters->applyFilters(
+        $secureCookie = $this->wpService->applyFilters(
             'secure_signon_cookie',
-            is_ssl(),
+            $this->wpService->isSsl(),
             $credentials
         );
 
         global $auth_secure_cookie;
         $auth_secure_cookie = $secureCookie;
 
-        add_filter('authenticate', 'wp_authenticate_cookie', 30, 3);
+        $this->wpService->addFilter('authenticate', 'wp_authenticate_cookie', 30, 3);
 
-        $user = get_user_by('login', $credentials['user_login']);
+        $user = $this->wpService->getUserBy('login', $credentials['user_login']);
         
         if ($user) {
-            wp_set_auth_cookie($user->ID, $credentials['remember'], $secureCookie);
-            $this->doAction->doAction('wp_login', $credentials['user_login'], $user);
+            $this->wpService->wpSetAuthCookie($user->ID, $credentials['remember'], $secureCookie);
+            $this->wpService->doAction('wp_login', $credentials['user_login'], $user);
         }
     }
 

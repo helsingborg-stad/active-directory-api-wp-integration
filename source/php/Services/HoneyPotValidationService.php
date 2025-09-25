@@ -4,7 +4,7 @@ namespace adApiWpIntegration\Services;
 
 use adApiWpIntegration\Contracts\InputHandlerInterface;
 use adApiWpIntegration\Config\ConfigInterface;
-use WpService\Contracts\AddAction;
+use WpService\WpService;
 
 /**
  * Honey pot validation service implementation.
@@ -21,7 +21,7 @@ class HoneyPotValidationService
     public function __construct(
         private InputHandlerInterface $inputHandler,
         private ConfigInterface $config,
-        private AddAction $addAction
+        private WpService $wpService
     ) {
         $this->fieldName = '_ad_hp_' . substr(md5(AUTH_KEY), 5, 10);
         $this->initializeHoneyPotValidation();
@@ -36,8 +36,8 @@ class HoneyPotValidationService
             return;
         }
 
-        $this->addAction->addAction('login_form', [$this, 'renderHoneyPot'], 15);
-        $this->addAction->addAction('wp_authenticate', [$this, 'validateHoneyPot'], 15);
+        $this->wpService->addAction('login_form', [$this, 'renderHoneyPot'], 15);
+        $this->wpService->addAction('wp_authenticate', [$this, 'validateHoneyPot'], 15);
     }
 
     /**
@@ -67,7 +67,7 @@ class HoneyPotValidationService
             return true;
         }
 
-        wp_die(__("Could not verify that you are not a bot. <a href='/wp-login.php'>Please try again.</a>", 'adintegration'));
+        $this->wpService->wpDie($this->wpService->__("Could not verify that you are not a bot. <a href='/wp-login.php'>Please try again.</a>", 'adintegration'));
     }
 
     /**
@@ -94,7 +94,7 @@ class HoneyPotValidationService
                     aria-hidden="true"
                 />
             </div>',
-            esc_attr($this->fieldName)
+            $this->wpService->escAttr($this->fieldName)
         );
     }
 

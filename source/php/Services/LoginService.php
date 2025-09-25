@@ -7,7 +7,7 @@ use adApiWpIntegration\Contracts\UserManagerInterface;
 use adApiWpIntegration\Contracts\RedirectionHandlerInterface;
 use adApiWpIntegration\Contracts\InputHandlerInterface;
 use adApiWpIntegration\Config\ConfigInterface;
-use WpService\Contracts\AddAction;
+use WpService\WpService;
 
 /**
  * Login service orchestrator.
@@ -25,7 +25,7 @@ class LoginService
         private RedirectionHandlerInterface $redirectionHandler,
         private InputHandlerInterface $inputHandler,
         private ConfigInterface $config,
-        private AddAction $addAction
+        private WpService $wpService
     ) {
         $this->initializeLogin();
     }
@@ -42,7 +42,7 @@ class LoginService
             return;
         }
 
-        $this->addAction->addAction('wp_authenticate', [$this, 'handleLogin'], 20);
+        $this->wpService->addAction('wp_authenticate', [$this, 'handleLogin'], 20);
     }
 
     /**
@@ -61,7 +61,7 @@ class LoginService
         }
 
         // Convert email to username if needed
-        if (is_email($username)) {
+        if ($this->wpService->isEmail($username)) {
             $username = $this->userManager->emailToUsername($username) ?: $username;
         }
 
@@ -133,6 +133,6 @@ class LoginService
      */
     private function sanitizeUsername(string $username): string
     {
-        return sanitize_text_field(trim($username));
+        return $this->wpService->sanitizeTextField(trim($username));
     }
 }

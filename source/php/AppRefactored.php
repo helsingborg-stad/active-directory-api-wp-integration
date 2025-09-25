@@ -4,7 +4,7 @@ namespace adApiWpIntegration;
 
 use adApiWpIntegration\Config\ConfigInterface;
 use adApiWpIntegration\Services\LoginService;
-use WpService\Contracts\AddFilter;
+use WpService\WpService;
 
 /**
  * Refactored Application class following SOLID principles.
@@ -19,7 +19,7 @@ class AppRefactored
     public function __construct(
         private LoginService $loginService,
         private ConfigInterface $config,
-        private AddFilter $addFilter
+        private WpService $wpService
     ) {
         $this->initializeApplication();
     }
@@ -48,8 +48,8 @@ class AppRefactored
      */
     private function setupEmailNotifications(): void
     {
-        $this->addFilter->addFilter('send_password_change_email', '__return_false');
-        $this->addFilter->addFilter('send_email_change_email', '__return_false');
+        $this->wpService->addFilter('send_password_change_email', '__return_false');
+        $this->wpService->addFilter('send_email_change_email', '__return_false');
     }
 
     /**
