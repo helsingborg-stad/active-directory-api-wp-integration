@@ -138,7 +138,7 @@ class App
 
         //Store to class
         $this->username = $username;
-        $this->password = $this->input->get('pwd');
+        $this->password = $this->input->post('pwd');
 
         //Only assume thre's a existing user id if autocreate is off
         if (!defined('AD_AUTOCREATE_USER') || (defined('AD_AUTOCREATE_USER') && AD_AUTOCREATE_USER === false)) {
