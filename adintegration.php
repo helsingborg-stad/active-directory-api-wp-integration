@@ -13,15 +13,15 @@
  * Domain Path:       /languages
  */
 
- // Protect agains direct file access
+// Protect against direct file access
 if (! defined('WPINC')) {
     die;
 }
 
-//Translations
+// Load translations
 load_plugin_textdomain('adintegration', false, plugin_basename(dirname(__FILE__)) . '/languages');
 
-//Constants
+// Define constants
 define('ADAPIWPINTEGRATION_PATH', plugin_dir_path(__FILE__));
 
 // Autoload from plugin
@@ -29,17 +29,38 @@ if (file_exists(ADAPIWPINTEGRATION_PATH . 'vendor/autoload.php')) {
     require_once ADAPIWPINTEGRATION_PATH . 'vendor/autoload.php';
 }
 
-//Input sanitazion
-$input = new adApiWpIntegration\Input();
-$wpService = new WpService\Implementations\NativeWpService();
+use adApiWpIntegration\Container\ServiceContainer;
+use adApiWpIntegration\AppRefactored;
+use WpService\Implementations\NativeWpService;
 
-//Run plugin
-new adApiWpIntegration\Database(); // Database normalization
-new adApiWpIntegration\App($input, $wpService); //Init
-new adApiWpIntegration\LoginNonce($input); // Nonce sec
-new adApiWpIntegration\LoginHoneyPot($input); // Nonce sec
-new adApiWpIntegration\Password(); //Do not allow ad-users to change their passwords
-new adApiWpIntegration\Admin(); // Sends admin panel errors & information
-new adApiWpIntegration\BulkImport($input); // Import user accounts in bulk
-new adApiWpIntegration\NewBlog(); // Propagate users if new blog is created
-new adApiWpIntegration\Cleaning($input); // Cleaning actions
+/**
+ * Bootstrap the plugin using SOLID principles.
+ * 
+ * This bootstrap follows the Dependency Inversion Principle by using a
+ * service container to manage dependencies. It implements the Single
+ * Responsibility Principle by separating concerns into focused services.
+ */
+
+// Create core dependencies
+$wpService = new NativeWpService();
+
+// Initialize service container with dependency injection
+$container = new ServiceContainer($wpService);
+
+// Bootstrap the refactored application
+$app = $container->get(AppRefactored::class);
+
+// Initialize security services using the refactored SOLID architecture
+$nonceValidation = $container->get(\adApiWpIntegration\Services\NonceValidationService::class);
+$honeyPotValidation = $container->get(\adApiWpIntegration\Services\HoneyPotValidationService::class);
+$passwordManagement = $container->get(\adApiWpIntegration\Services\PasswordManagementService::class);
+
+// Initialize remaining legacy classes (to be refactored in future iterations)
+// These maintain backward compatibility while we incrementally refactor
+$input = $container->get(adApiWpIntegration\Contracts\InputHandlerInterface::class);
+
+new adApiWpIntegration\Database(); // Database normalization - TODO: Refactor to follow SOLID
+new adApiWpIntegration\Admin(); // Admin panel management - TODO: Refactor to follow SOLID
+new adApiWpIntegration\BulkImport($input); // Bulk import functionality - TODO: Refactor to follow SOLID
+new adApiWpIntegration\NewBlog(); // New blog propagation - TODO: Refactor to follow SOLID
+new adApiWpIntegration\Cleaning($input); // Cleaning actions - TODO: Refactor to follow SOLID

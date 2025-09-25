@@ -96,6 +96,31 @@ class ServiceContainer
             );
         });
 
+        // Register security services
+        $this->registerSingleton(\adApiWpIntegration\Services\NonceValidationService::class, function () {
+            return new \adApiWpIntegration\Services\NonceValidationService(
+                $this->get(InputHandlerInterface::class),
+                $this->get(ConfigInterface::class),
+                $this->get(WpService::class),
+                $this->get(WpService::class)
+            );
+        });
+
+        $this->registerSingleton(\adApiWpIntegration\Services\HoneyPotValidationService::class, function () {
+            return new \adApiWpIntegration\Services\HoneyPotValidationService(
+                $this->get(InputHandlerInterface::class),
+                $this->get(ConfigInterface::class),
+                $this->get(WpService::class)
+            );
+        });
+
+        $this->registerSingleton(\adApiWpIntegration\Services\PasswordManagementService::class, function () {
+            return new \adApiWpIntegration\Services\PasswordManagementService(
+                $this->get(ConfigInterface::class),
+                $this->get(WpService::class)
+            );
+        });
+
         $this->registerSingleton(AppRefactored::class, function () {
             return new AppRefactored(
                 $this->get(LoginService::class),
