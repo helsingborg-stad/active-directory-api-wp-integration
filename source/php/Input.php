@@ -2,7 +2,16 @@
 
 namespace adApiWpIntegration;
 
-class Input
+use adApiWpIntegration\Contracts\InputHandlerInterface;
+
+/**
+ * Input handling service implementation.
+ * 
+ * This class follows the Single Responsibility Principle by handling only
+ * input sanitization and retrieval. It implements the InputHandlerInterface
+ * to allow for easy testing and extensibility.
+ */
+class Input implements InputHandlerInterface
 {
   private $postVars = array(
     'pwd' => null,
