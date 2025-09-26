@@ -22,7 +22,9 @@ class Profile
     public function update($data, $user_id, $updatePassword = true)
     {
         //Basic definition with only an id
-        $fields = array('ID' => $user_id);
+        $fields = array(
+            'ID' => $user_id
+        );
 
         //Update name
         if (AD_UPDATE_NAME && isset($data->displayname) && !empty($data->displayname)) {
@@ -33,6 +35,8 @@ class Profile
             $fields['display_name'] = $name['firstname'] . " " . $name['lastname'];
         }
 
+        
+
         //Update email
         if (isset($data->mail) && is_email($data->mail) && AD_UPDATE_EMAIL) {
             $fields['user_email'] = strtolower($data->mail);
@@ -40,7 +44,7 @@ class Profile
 
         //Update companyname (only in municipio theme)
         if (isset($data->company) && !empty($data->company)) {
-           //TODO: Use helper from Municipio to set company name
+            $fields['companyname'] = $data->company;
         }
 
         //Update password
@@ -79,5 +83,8 @@ class Profile
 
         //Last updated by ad timestamp
         update_user_meta($user_id, AD_META_PREFIX . apply_filters('adApiWpIntegration/profile/metaKey', "last_sync"), date("Y-m-d H:i:s"));
+
+        //Action hook
+        do_action('adApiWpIntegration/profile/updated', $user_id, $data, $fields);
     }
 }
