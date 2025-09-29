@@ -46,7 +46,7 @@ class BulkImport
         //Create cronjob
         add_action('init', function () {
             if (is_main_site() && !wp_next_scheduled('ad_integration_bulk_import')) {
-                wp_schedule_event((strtotime("midnight") + (60 * 60 * 3)), 'daily', 'ad_integration_bulk_import');
+                wp_schedule_event( time(), 'hourly', 'ad_integration_bulk_import' );
             }
         });
 
