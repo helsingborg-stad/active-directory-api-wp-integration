@@ -4,7 +4,7 @@
  * Plugin Name:       Active Directory Integration
  * Plugin URI:        https://github.com/helsingborg-stad/active-directory-api-wp-integration
  * Description:       Integration with the simple active directory api service
- * Version: 3.1.4
+ * Version: 3.1.5
  * Author:            Sebastian Thulin
  * Author URI:        https://github.com/sebastianthulin
  * License:           MIT
