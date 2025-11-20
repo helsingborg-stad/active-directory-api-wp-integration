@@ -16,6 +16,5 @@
         "psr-4": {
             "adApiWpIntegration\\": "source/php/"
         }
-    },
-    "version": "3.1.5"
+    }
 }
