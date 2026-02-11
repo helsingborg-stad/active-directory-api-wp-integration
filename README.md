@@ -33,6 +33,33 @@ Adds all users to all sites in the network:
 wp adintegration propagate
 ```
 
+## Individual User Management (CRUD Operations)
+
+Manage individual users with get, update, and delete operations.
+
+### Get user information from Active Directory
+Retrieves user details from AD and shows WordPress status:
+```bash
+wp adintegration user get john.doe
+wp adintegration user get john.doe@example.com
+```
+
+### Update user profile from Active Directory
+Updates an existing WordPress user's profile from AD, or creates the user if `--create` flag is used:
+```bash
+# Update existing user
+wp adintegration user update john.doe
+
+# Create user if not exists and update profile
+wp adintegration user update john.doe --create
+```
+
+### Delete user from WordPress
+Removes a user from WordPress (requires confirmation):
+```bash
+wp adintegration user delete john.doe
+```
+
 ## Cleaning Commands
 
 ### Remove duplicate users
