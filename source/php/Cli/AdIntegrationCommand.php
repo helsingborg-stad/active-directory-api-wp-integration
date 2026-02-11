@@ -446,15 +446,21 @@ class AdIntegrationCommand
             }
 
             WP_CLI::log("User does not exist in WordPress. Creating...");
-            $this->bulkImport->createAccount([$username]);
-            $wpUserId = username_exists($username);
+            
+            try {
+                $this->bulkImport->createAccount([$username]);
+                $wpUserId = username_exists($username);
 
-            if (!$wpUserId) {
-                WP_CLI::error("Failed to create user '{$username}' in WordPress.");
+                if (!$wpUserId) {
+                    WP_CLI::error("Failed to create user '{$username}' in WordPress. User may not exist in Active Directory or account creation may have failed. Check error logs for details.");
+                    return;
+                }
+
+                WP_CLI::success("User created in WordPress (ID: {$wpUserId})");
+            } catch (\Exception $e) {
+                WP_CLI::error("Failed to create user '{$username}': " . $e->getMessage());
                 return;
             }
-
-            WP_CLI::success("User created in WordPress (ID: {$wpUserId})");
         } else {
             WP_CLI::log("User exists in WordPress (ID: {$wpUserId})");
         }
@@ -538,7 +544,7 @@ class AdIntegrationCommand
         );
 
         // Validate JSON response
-        if ($response::isJsonError($userDataJson)) {
+        if (\adApiWpIntegration\Helper\Response::isJsonError($userDataJson)) {
             return false;
         }
 
@@ -567,8 +573,13 @@ class AdIntegrationCommand
         }
 
         // If not found in WordPress, extract username from email (before @)
-        $parts = explode('@', $email);
-        return $parts[0];
+        // Note: is_email() validation is done before calling this function
+        if (strpos($email, '@') !== false) {
+            $parts = explode('@', $email);
+            return $parts[0];
+        }
+
+        return false;
     }
 
     /**
