@@ -50,12 +50,15 @@ class AdIntegrationCommand
         WP_CLI::log('Starting Active Directory user synchronization...');
 
         // Set up environment for bulk operation
-        define('DOING_CRON', true);
+        if (!defined('DOING_CRON')) {
+            define('DOING_CRON', true);
+        }
         ini_set('memory_limit', '2048M');
-        ini_set('max_execution_time', 60 * 60 * 60);
+        ini_set('max_execution_time', 3600); // 1 hour
 
         // Handle max delete limit
         $maxDeleteLimit = isset($assoc_args['max-delete-limit']) ? (int) $assoc_args['max-delete-limit'] : 1000;
+        // Note: Setting $_GET is required for compatibility with existing BulkImport::cron() implementation
         $_GET['maxDeletelimit'] = $maxDeleteLimit;
         
         // Refresh input with new GET values
@@ -110,9 +113,11 @@ class AdIntegrationCommand
         WP_CLI::log('Starting user profile updates from Active Directory...');
 
         // Set up environment for bulk operation
-        define('DOING_CRON', true);
+        if (!defined('DOING_CRON')) {
+            define('DOING_CRON', true);
+        }
         ini_set('memory_limit', '2048M');
-        ini_set('max_execution_time', 60 * 60 * 60);
+        ini_set('max_execution_time', 3600); // 1 hour
 
         $userAccounts = $this->bulkImport->getLocalAccounts();
         
@@ -178,9 +183,11 @@ class AdIntegrationCommand
         WP_CLI::log('Starting user propagation across multisite network...');
 
         // Set up environment for bulk operation
-        define('DOING_CRON', true);
+        if (!defined('DOING_CRON')) {
+            define('DOING_CRON', true);
+        }
         ini_set('memory_limit', '2048M');
-        ini_set('max_execution_time', 60 * 60 * 60);
+        ini_set('max_execution_time', 3600); // 1 hour
 
         require_once(ABSPATH . 'wp-admin/includes/user.php');
 
@@ -276,6 +283,7 @@ class AdIntegrationCommand
         WP_CLI::log('Removing orphaned user metadata...');
 
         try {
+            // Note: Method name has typo in original Cleaning class (removeOphanUserMeta)
             $this->cleaning->removeOphanUserMeta();
             WP_CLI::success('Orphaned user metadata removed successfully.');
         } catch (\Exception $e) {
