@@ -9,6 +9,16 @@ Integration with the simple active directory api service (https://github.com/hel
 # Database modifications
 This plugin will alter the index of the user table to require unique usernames. This is not a default behavior for WordPress and may break other plugins related to user management. 
 
+# WordPress Admin User Actions
+When bulk import is enabled, the plugin adds an "Update from AD" action to each user in the WordPress admin user list (Users → All Users). This allows administrators to manually update individual user profiles from Active Directory with a single click.
+
+**How to use:**
+1. Navigate to Users → All Users in WordPress admin
+2. Hover over a user row
+3. Click "Update from AD" link
+4. The user's profile will be updated with the latest information from Active Directory
+5. A success or error message will be displayed
+
 # WP-CLI Commands
 The plugin provides WP-CLI commands for managing bulk operations with clear logging. This is the recommended approach for production environments.
 
