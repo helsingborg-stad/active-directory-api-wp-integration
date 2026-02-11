@@ -72,7 +72,7 @@ class UserActions
     public function handleUpdateAction()
     {
         // Check if this is our action
-        if (!isset($_GET['action']) || $_GET['action'] !== 'update_from_ad') {
+        if (!isset($_GET['action']) || sanitize_text_field($_GET['action']) !== 'update_from_ad') {
             return;
         }
 
@@ -84,7 +84,7 @@ class UserActions
         $user_id = intval($_GET['user_id']);
 
         // Verify nonce
-        if (!isset($_GET['_wpnonce']) || !wp_verify_nonce($_GET['_wpnonce'], 'update_from_ad_' . $user_id)) {
+        if (!isset($_GET['_wpnonce']) || !wp_verify_nonce(sanitize_text_field($_GET['_wpnonce']), 'update_from_ad_' . $user_id)) {
             wp_die(__('Security check failed', 'adintegration'));
         }
 
@@ -124,6 +124,7 @@ class UserActions
             require_once(ABSPATH . 'wp-admin/includes/user.php');
             
             $profile = new Profile($this->input);
+            // Update profile from AD data (false = don't update password)
             $profile->update($userData, $user_id, false);
 
             $this->setTransientMessage(
