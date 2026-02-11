@@ -9,15 +9,56 @@ Integration with the simple active directory api service (https://github.com/hel
 # Database modifications
 This plugin will alter the index of the user table to require unique usernames. This is not a default behavior for WordPress and may break other plugins related to user management. 
 
-# Trigger manual bulkimport
-You can trigger a manual bulkimport. This will directly call the bulkimport function in your current call. Profile updates will be sheduled every minute following, until all WordPress users has been updated. 
+# WP-CLI Commands
+The plugin provides WP-CLI commands for managing bulk operations with clear logging. This is the recommended approach for production environments.
+
+## User Synchronization Commands
+
+### Sync users with Active Directory
+Imports new users from AD and removes users that no longer exist:
+```bash
+wp adintegration sync
+wp adintegration sync --max-delete-limit=500
+```
+
+### Update user profiles
+Updates all WordPress user profiles with latest data from AD:
+```bash
+wp adintegration update-profiles
+```
+
+### Propagate users (Multisite)
+Adds all users to all sites in the network:
+```bash
+wp adintegration propagate
+```
+
+## Cleaning Commands
+
+### Remove duplicate users
+```bash
+wp adintegration clean-users
+```
+
+### Remove orphaned user metadata
+```bash
+wp adintegration clean-meta
+```
+
+### Remove empty user capabilities
+```bash
+wp adintegration clean-capabilities
+```
+
+# Trigger manual bulkimport (Legacy - Query Parameters)
+**⚠️ Deprecated:** Query parameter triggers are maintained for backward compatibility but WP-CLI commands are recommended for better logging and monitoring.
 
 Import new users / remove old: https://site.dev/wp-admin/?adbulkimport
 Update registered profiles: https://site.dev/wp-admin/?adbulkprofile
 Propagate user roles to all sites: https://site.dev/wp-admin/?adbulkpropagate
 
-# Trigger manual cleaning actions 
-Cleaning actions to keep WordPress tables clean in some installations that are using bad object cache-engines.
+# Trigger manual cleaning actions (Legacy - Query Parameters)
+**⚠️ Deprecated:** Query parameter triggers are maintained for backward compatibility but WP-CLI commands are recommended.
 
 Remove duplicate users: https://site.dev/wp-admin/?adcleanusers
 Remove orphan user meta: https://site.dev/wp-admin/?adcleanmeta
