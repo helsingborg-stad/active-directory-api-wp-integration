@@ -43,3 +43,9 @@ new adApiWpIntegration\Admin(); // Sends admin panel errors & information
 new adApiWpIntegration\BulkImport($input); // Import user accounts in bulk
 new adApiWpIntegration\NewBlog(); // Propagate users if new blog is created
 new adApiWpIntegration\Cleaning($input); // Cleaning actions
+new adApiWpIntegration\UserActions($input); // User row actions in admin
+
+// Register WP-CLI commands
+if (defined('WP_CLI') && WP_CLI) {
+    WP_CLI::add_command('adintegration', 'adApiWpIntegration\Cli\AdIntegrationCommand');
+}
