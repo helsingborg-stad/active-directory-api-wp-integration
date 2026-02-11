@@ -340,6 +340,17 @@ class BulkImport
                             )
                         );
 
+                        $isWpCli = defined('WP_CLI') && WP_CLI;
+
+                        if (is_wp_error($userId)) {
+                            if ($isWpCli) {
+                                \WP_CLI::error("Error: Could not create a new user using bulk data (ad-api-integration). " . $userId->get_error_message());
+                            }
+                        } else {
+                            if ($isWpCli) {
+                                \WP_CLI::success("Created user '{$userName}' with ID {$userId} using bulk data (ad-api-integration).");
+                            }
+                        }
                     } catch (\Exception $e) {
                         error_log("Error: Could not create a new user using bulk data (ad-api-integration).");
                     }
@@ -420,17 +431,31 @@ class BulkImport
     public function deleteAccount($userToDelete)
     {
         if ($userId = $this->userNameExists($userToDelete)) {
+            $isWpCli = defined('WP_CLI') && WP_CLI;
             if (is_multisite()) {
                 if ($reassign = $this->reassignToUserId()) {
                     foreach ($this->sites as $site) {
                         remove_user_from_blog($userId, $site->blog_id, $reassign);
+                        if ($isWpCli) {
+                            \WP_CLI::log("Removed user '{$userToDelete}' (ID: {$userId}) from site {$site->blog_id}, reassigned content to user ID {$reassign}.");
+                        }
                     }
                     $this->db->delete($this->db->users, array('ID' => $userId));
+                    if ($isWpCli) {
+                        \WP_CLI::log("Deleted user '{$userToDelete}' (ID: {$userId}) from users table.");
+                    }
                 }
             } else {
                 if ($reassign = $this->reassignToUserId()) {
                     wp_delete_user($userId, $reassign);
+                    if ($isWpCli) {
+                        \WP_CLI::log("Deleted user '{$userToDelete}' (ID: {$userId}), reassigned content to user ID {$reassign}.");
+                    }
                 }
+            }
+        } else {
+            if (defined('WP_CLI') && WP_CLI) {
+                \WP_CLI::log("User '{$userToDelete}' does not exist, nothing to delete.");
             }
         }
     }
