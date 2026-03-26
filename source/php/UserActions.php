@@ -2,8 +2,6 @@
 
 namespace adApiWpIntegration;
 
-use adApiWpIntegration\Input;
-use adApiWpIntegration\Profile;
 use adApiWpIntegration\Helper\Curl;
 use adApiWpIntegration\Helper\Response;
 
@@ -24,13 +22,13 @@ class UserActions
         }
 
         // Add row action to user list
-        add_filter('user_row_actions', array($this, 'addRowAction'), 10, 2);
+        add_filter('user_row_actions', [$this, 'addRowAction'], 10, 2);
 
         // Handle the update action
-        add_action('admin_init', array($this, 'handleUpdateAction'));
+        add_action('admin_init', [$this, 'handleUpdateAction']);
 
         // Add admin notice for results
-        add_action('admin_notices', array($this, 'showAdminNotice'));
+        add_action('admin_notices', [$this, 'showAdminNotice']);
     }
 
     /**
@@ -49,18 +47,18 @@ class UserActions
 
         // Create the update from AD link
         $url = add_query_arg(
-            array(
+            [
                 'action' => 'update_from_ad',
                 'user_id' => $user->ID,
-                '_wpnonce' => wp_create_nonce('update_from_ad_' . $user->ID)
-            ),
-            admin_url('users.php')
+                '_wpnonce' => wp_create_nonce('update_from_ad_' . $user->ID),
+            ],
+            admin_url('users.php'),
         );
 
         $actions['update_from_ad'] = sprintf(
             '<a href="%s">%s</a>',
             esc_url($url),
-            __('Update from AD', 'adintegration')
+            __('Update from AD', 'adintegration'),
         );
 
         return $actions;
@@ -98,7 +96,7 @@ class UserActions
         if (!$user) {
             $this->setTransientMessage('error', __('User not found', 'adintegration'));
             wp_safe_redirect(admin_url('users.php'));
-            exit;
+            exit();
         }
 
         // Get username
@@ -112,17 +110,17 @@ class UserActions
                 'error',
                 sprintf(
                     __('User "%s" not found in Active Directory', 'adintegration'),
-                    esc_html($username)
-                )
+                    esc_html($username),
+                ),
             );
             wp_safe_redirect(admin_url('users.php'));
-            exit;
+            exit();
         }
 
         // Update user profile
         try {
-            require_once(ABSPATH . 'wp-admin/includes/user.php');
-            
+            require_once ABSPATH . 'wp-admin/includes/user.php';
+
             $profile = new Profile($this->input);
             // Update profile from AD data (false = don't update password)
             $profile->update($userData, $user_id, false);
@@ -131,8 +129,8 @@ class UserActions
                 'success',
                 sprintf(
                     __('User "%s" successfully updated from Active Directory', 'adintegration'),
-                    esc_html($user->display_name)
-                )
+                    esc_html($user->display_name),
+                ),
             );
         } catch (\Exception $e) {
             $this->setTransientMessage(
@@ -140,14 +138,14 @@ class UserActions
                 sprintf(
                     __('Failed to update user "%s": %s', 'adintegration'),
                     esc_html($username),
-                    esc_html($e->getMessage())
-                )
+                    esc_html($e->getMessage()),
+                ),
             );
         }
 
         // Redirect back to users page
         wp_safe_redirect(admin_url('users.php'));
-        exit;
+        exit();
     }
 
     /**
@@ -163,7 +161,7 @@ class UserActions
             printf(
                 '<div class="notice %s is-dismissible"><p>%s</p></div>',
                 esc_attr($class),
-                wp_kses_post($message)
+                wp_kses_post($message),
             );
 
             // Delete transients
@@ -195,18 +193,18 @@ class UserActions
         $curl = new Curl();
 
         // Authentication
-        $data = array(
+        $data = [
             'username' => constant('AD_BULK_IMPORT_USER'),
-            'password' => constant('AD_BULK_IMPORT_PASSWORD')
-        );
+            'password' => constant('AD_BULK_IMPORT_PASSWORD'),
+        ];
 
         // Fetch user data
         $userDataJson = $curl->request(
             'POST',
-            rtrim(constant('AD_INTEGRATION_URL'), "/") . '/user/get/' . $username . "/",
+            rtrim(constant('AD_INTEGRATION_URL'), '/') . '/user/get/' . $username . '/',
             $data,
             'json',
-            array('Content-Type: application/json')
+            ['Content-Type: application/json'],
         );
 
         // Validate JSON response

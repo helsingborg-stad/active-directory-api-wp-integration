@@ -4,25 +4,26 @@ namespace adApiWpIntegration;
 
 class LoginHoneyPot
 {
-    private $fieldMinTime = ""; //ms
-    private $fieldName = ""; 
+    private $fieldMinTime = ''; //ms
+    private $fieldName = '';
 
     /**
      * Hook nonce validation
      * @return void
      */
-    public function __construct(private Input $input)
-    {
+    public function __construct(
+        private Input $input,
+    ) {
         //Define AD_HP_VALIDATION to false to disable validation
-        if(defined('AD_HP_VALIDATION') && constant('AD_HP_VALIDATION') === false) {
+        if (defined('AD_HP_VALIDATION') && constant('AD_HP_VALIDATION') === false) {
             return false;
         }
 
-        $this->fieldMinTime     = 457; 
-        $this->fieldName        = '_ad_hp_' . substr(md5(AUTH_KEY), 5, 10);
+        $this->fieldMinTime = 457;
+        $this->fieldName = '_ad_hp_' . substr(md5(AUTH_KEY), 5, 10);
 
-        add_action('login_form', array($this, 'renderHoneyPot'), 15);
-        add_action('wp_authenticate', array($this, 'validateHoneyPot'), 15); // Ad login priority = 20
+        add_action('login_form', [$this, 'renderHoneyPot'], 15);
+        add_action('wp_authenticate', [$this, 'validateHoneyPot'], 15); // Ad login priority = 20
     }
 
     /**
@@ -37,7 +38,7 @@ class LoginHoneyPot
                 <input 
                         class="ad-login-field" 
                         type="text" 
-                        name="'. $this->fieldName .'"
+                        name="' . $this->fieldName . '"
                         autocomplete="off" 
                         tabIndex="-1"
                         aria-hidden="true"
@@ -61,11 +62,11 @@ class LoginHoneyPot
      * Check the nonce before running login procedure, must use a hook lower than 20 (ad hijack).
      * @return void / bool
      */
-    public function validateHoneyPot($username = "")
+    public function validateHoneyPot($username = '')
     {
         $honeyPotValue = isset($_POST[$this->fieldName]) ? sanitize_text_field($_POST[$this->fieldName]) : null;
         if ($honeyPotValue !== null) {
-            if($honeyPotValue == $this->fieldMinTime) {
+            if ($honeyPotValue == $this->fieldMinTime) {
                 return true;
             }
             wp_die(__("Could not verify that you are not a bot. <a href='/wp-login.php'>Please try again.</a>", 'adintegration'));

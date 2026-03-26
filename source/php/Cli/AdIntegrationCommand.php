@@ -60,7 +60,7 @@ class AdIntegrationCommand
         $maxDeleteLimit = isset($assoc_args['max-delete-limit']) ? (int) $assoc_args['max-delete-limit'] : 1000;
         // Note: Setting $_GET is required for compatibility with existing BulkImport::cron() implementation
         $_GET['maxDeletelimit'] = $maxDeleteLimit;
-        
+
         // Refresh input with new GET values
         $this->input = new Input();
         $this->bulkImport = new BulkImport($this->input);
@@ -78,11 +78,11 @@ class AdIntegrationCommand
         try {
             $this->bulkImport->cron();
             WP_CLI::success('User synchronization completed successfully.');
-            
+
             WP_CLI::log('Summary:');
             WP_CLI::log('- Users to create: ' . count($createAccounts));
             WP_CLI::log('- Users to delete: ' . count($deleteAccounts));
-            
+
             if (count($deleteAccounts) > $maxDeleteLimit) {
                 WP_CLI::warning('Deletion limit exceeded. ' . count($deleteAccounts) . ' users need deletion but limit is ' . $maxDeleteLimit);
                 WP_CLI::log('To allow these deletions, run: wp adintegration sync --max-delete-limit=' . count($deleteAccounts));
@@ -120,7 +120,7 @@ class AdIntegrationCommand
         ini_set('max_execution_time', 3600); // 1 hour
 
         $userAccounts = $this->bulkImport->getLocalAccounts();
-        
+
         if (!is_array($userAccounts) || empty($userAccounts)) {
             WP_CLI::warning('No user accounts found to update.');
             return;
@@ -139,13 +139,13 @@ class AdIntegrationCommand
             foreach ($userAccountsChunked as $index => $userChunk) {
                 $chunkNumber = $index + 1;
                 WP_CLI::log("Processing chunk {$chunkNumber}/{$chunkCount}...");
-                
+
                 $this->bulkImport->updateProfiles($userChunk);
                 $processedCount += count($userChunk);
-                
+
                 WP_CLI::log("Progress: {$processedCount}/{$totalUsers} users processed");
             }
-            
+
             WP_CLI::success("Successfully updated profiles for {$totalUsers} users.");
         } catch (\Exception $e) {
             WP_CLI::error('Failed to update user profiles: ' . $e->getMessage());
@@ -189,11 +189,11 @@ class AdIntegrationCommand
         ini_set('memory_limit', '2048M');
         ini_set('max_execution_time', 3600); // 1 hour
 
-        require_once(ABSPATH . 'wp-admin/includes/user.php');
+        require_once ABSPATH . 'wp-admin/includes/user.php';
 
         $sites = get_sites();
         $userAccounts = $this->bulkImport->getLocalAccounts();
-        
+
         if (!$sites || empty($sites)) {
             WP_CLI::warning('No sites found in the network.');
             return;
@@ -204,9 +204,7 @@ class AdIntegrationCommand
             return;
         }
 
-        $defaultRole = defined('AD_BULK_IMPORT_ROLE') && get_role(AD_BULK_IMPORT_ROLE) 
-            ? AD_BULK_IMPORT_ROLE 
-            : 'subscriber';
+        $defaultRole = defined('AD_BULK_IMPORT_ROLE') && get_role(AD_BULK_IMPORT_ROLE) ? AD_BULK_IMPORT_ROLE : 'subscriber';
 
         $siteCount = count($sites);
         $userCount = count($userAccounts);
@@ -222,7 +220,7 @@ class AdIntegrationCommand
 
                 foreach ($userAccounts as $userName) {
                     $userId = username_exists($userName);
-                    
+
                     if ($userId) {
                         if (!is_user_member_of_blog($userId, $site->blog_id)) {
                             add_user_to_blog($site->blog_id, $userId, $defaultRole);
@@ -235,7 +233,7 @@ class AdIntegrationCommand
             }
 
             WP_CLI::success('User propagation completed.');
-            WP_CLI::log("Summary:");
+            WP_CLI::log('Summary:');
             WP_CLI::log("- Users added to sites: {$addedCount}");
             WP_CLI::log("- Users already members: {$skippedCount}");
         } catch (\Exception $e) {
@@ -408,21 +406,21 @@ class AdIntegrationCommand
 
         // Check if user exists in WordPress
         $wpUserId = username_exists($username);
-        $wpStatus = $wpUserId ? "Exists in WordPress (ID: {$wpUserId})" : "Not in WordPress";
+        $wpStatus = $wpUserId ? "Exists in WordPress (ID: {$wpUserId})" : 'Not in WordPress';
 
-        WP_CLI::success("User found in Active Directory");
+        WP_CLI::success('User found in Active Directory');
         WP_CLI::log("\nUser Details:");
-        WP_CLI::log("- Username: " . ($userData->samaccountname ?? 'N/A'));
-        WP_CLI::log("- Display Name: " . ($userData->displayname ?? 'N/A'));
-        WP_CLI::log("- Email: " . ($userData->mail ?? 'N/A'));
-        WP_CLI::log("- Company: " . ($userData->company ?? 'N/A'));
+        WP_CLI::log('- Username: ' . ($userData->samaccountname ?? 'N/A'));
+        WP_CLI::log('- Display Name: ' . ($userData->displayname ?? 'N/A'));
+        WP_CLI::log('- Email: ' . ($userData->mail ?? 'N/A'));
+        WP_CLI::log('- Company: ' . ($userData->company ?? 'N/A'));
         WP_CLI::log("- WordPress Status: {$wpStatus}");
 
         if (!$wpUserId) {
             WP_CLI::log("\nTo create this user in WordPress, run:");
             WP_CLI::log("  wp adintegration user update {$username} --create");
-            WP_CLI::log("Or sync all users:");
-            WP_CLI::log("  wp adintegration sync");
+            WP_CLI::log('Or sync all users:');
+            WP_CLI::log('  wp adintegration sync');
         }
     }
 
@@ -445,8 +443,8 @@ class AdIntegrationCommand
                 return;
             }
 
-            WP_CLI::log("User does not exist in WordPress. Creating...");
-            
+            WP_CLI::log('User does not exist in WordPress. Creating...');
+
             try {
                 $this->bulkImport->createAccount([$username]);
                 $wpUserId = username_exists($username);
@@ -474,16 +472,16 @@ class AdIntegrationCommand
         }
 
         // Update user profile
-        require_once(ABSPATH . 'wp-admin/includes/user.php');
-        
+        require_once ABSPATH . 'wp-admin/includes/user.php';
+
         $profile = new \adApiWpIntegration\Profile($this->input);
         $profile->update($userData, $wpUserId, false);
 
-        WP_CLI::success("User profile updated successfully from Active Directory");
+        WP_CLI::success('User profile updated successfully from Active Directory');
         WP_CLI::log("\nUpdated Information:");
-        WP_CLI::log("- Display Name: " . ($userData->displayname ?? 'N/A'));
-        WP_CLI::log("- Email: " . ($userData->mail ?? 'N/A'));
-        WP_CLI::log("- Company: " . ($userData->company ?? 'N/A'));
+        WP_CLI::log('- Display Name: ' . ($userData->displayname ?? 'N/A'));
+        WP_CLI::log('- Email: ' . ($userData->mail ?? 'N/A'));
+        WP_CLI::log('- Company: ' . ($userData->company ?? 'N/A'));
     }
 
     /**
@@ -505,7 +503,7 @@ class AdIntegrationCommand
         // Confirm before deletion
         WP_CLI::confirm("Are you sure you want to delete user '{$username}' (ID: {$wpUserId})?");
 
-        require_once(ABSPATH . 'wp-admin/includes/user.php');
+        require_once ABSPATH . 'wp-admin/includes/user.php';
 
         $this->bulkImport->deleteAccount($username);
 
@@ -529,18 +527,18 @@ class AdIntegrationCommand
         $response = new \adApiWpIntegration\Helper\Response();
 
         // Authentication
-        $data = array(
+        $data = [
             'username' => constant('AD_BULK_IMPORT_USER'),
-            'password' => constant('AD_BULK_IMPORT_PASSWORD')
-        );
+            'password' => constant('AD_BULK_IMPORT_PASSWORD'),
+        ];
 
         // Fetch user data
         $userDataJson = $curl->request(
             'POST',
-            rtrim(constant('AD_INTEGRATION_URL'), "/") . '/user/get/' . $username . "/",
+            rtrim(constant('AD_INTEGRATION_URL'), '/') . '/user/get/' . $username . '/',
             $data,
             'json',
-            array('Content-Type: application/json')
+            ['Content-Type: application/json'],
         );
 
         // Validate JSON response

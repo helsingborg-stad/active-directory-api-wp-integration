@@ -4,16 +4,15 @@ namespace adApiWpIntegration;
 
 class Database
 {
-
     private $db;
 
     public function __construct()
     {
         //Get wpdb instance
-        add_action('init', array($this, 'fetchDatabaseInstance'), 1);
+        add_action('init', [$this, 'fetchDatabaseInstance'], 1);
 
         //Normalization of user table
-        add_action('admin_init', array($this, 'forceUniqueUserNames'));
+        add_action('admin_init', [$this, 'forceUniqueUserNames']);
     }
 
     /**
@@ -34,15 +33,14 @@ class Database
     public function forceUniqueUserNames()
     {
         //Check for not unique index in user table
-        $userLoginIndex = $this->db->get_row("SHOW INDEX FROM " . $this->db->users . " WHERE Key_name = 'user_login_key' AND Non_unique = 1");
+        $userLoginIndex = $this->db->get_row('SHOW INDEX FROM ' . $this->db->users . " WHERE Key_name = 'user_login_key' AND Non_unique = 1");
 
         if (is_object($userLoginIndex) && !empty($userLoginIndex)) {
-
             //Remove old index
-            $this->db->query("ALTER TABLE " . $this->db->users . " DROP INDEX user_login_key");
+            $this->db->query('ALTER TABLE ' . $this->db->users . ' DROP INDEX user_login_key');
 
             //Add new index
-            $this->db->query("ALTER TABLE " . $this->db->users . " ADD UNIQUE user_login_key (user_login);");
+            $this->db->query('ALTER TABLE ' . $this->db->users . ' ADD UNIQUE user_login_key (user_login);');
         }
     }
 }
