@@ -2,14 +2,13 @@
 
 namespace adApiWpIntegration;
 
-use adApiWpIntegration\Input;
-
 class Profile
 {
     public $format = null;
 
-    public function __construct(private Input $input)
-    {
+    public function __construct(
+        private Input $input,
+    ) {
         if (is_null($this->format)) {
             $this->format = new Helper\Format();
         }
@@ -19,12 +18,12 @@ class Profile
      * Update user profile details
      * @return void
      */
-    public function update($data, $user_id, $updatePassword = true)
+    public function update($data, $user_id, #[\SensitiveParameter] $updatePassword = true)
     {
         //Basic definition with only an id
-        $fields = array(
-            'ID' => $user_id
-        );
+        $fields = [
+            'ID' => $user_id,
+        ];
 
         //Update name
         if (AD_UPDATE_NAME && isset($data->displayname) && !empty($data->displayname)) {
@@ -32,10 +31,8 @@ class Profile
 
             $fields['first_name'] = $name['firstname'];
             $fields['last_name'] = $name['lastname'];
-            $fields['display_name'] = $name['firstname'] . " " . $name['lastname'];
+            $fields['display_name'] = $name['firstname'] . ' ' . $name['lastname'];
         }
-
-        
 
         //Update email
         if (isset($data->mail) && is_email($data->mail) && AD_UPDATE_EMAIL) {
@@ -74,15 +71,17 @@ class Profile
 
         //Update meta
         if (AD_UPDATE_META && (is_object($data) || is_array($data))) {
-            foreach ((array)$data as $meta_key => $meta_value) {
-                if (!in_array($meta_key, apply_filters('adApiWpIntegration/profile/disabledMetaKey', array("sn", "samaccountname", "mail", "userprincipalname")))) {
-                    update_user_meta($user_id, AD_META_PREFIX . apply_filters('adApiWpIntegration/profile/metaKey', $meta_key), $meta_value);
+            foreach ((array) $data as $meta_key => $meta_value) {
+                if (in_array($meta_key, apply_filters('adApiWpIntegration/profile/disabledMetaKey', ['sn', 'samaccountname', 'mail', 'userprincipalname']))) {
+                    continue;
                 }
+
+                update_user_meta($user_id, AD_META_PREFIX . apply_filters('adApiWpIntegration/profile/metaKey', $meta_key), $meta_value);
             }
         }
 
         //Last updated by ad timestamp
-        update_user_meta($user_id, AD_META_PREFIX . apply_filters('adApiWpIntegration/profile/metaKey', "last_sync"), date("Y-m-d H:i:s"));
+        update_user_meta($user_id, AD_META_PREFIX . apply_filters('adApiWpIntegration/profile/metaKey', 'last_sync'), date('Y-m-d H:i:s'));
 
         //Action hook
         do_action('adApiWpIntegration/profile/updated', $user_id, $data, $fields);

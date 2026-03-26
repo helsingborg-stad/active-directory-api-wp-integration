@@ -4,7 +4,6 @@ namespace adApiWpIntegration;
 
 class NewBlog
 {
-
     private $defaultRole;
 
     /**
@@ -14,24 +13,24 @@ class NewBlog
     public function __construct()
     {
         //Set default role
-        $this->defaultRole = defined('AD_BULK_IMPORT_ROLE') ? AD_BULK_IMPORT_ROLE : "subscriber";
+        $this->defaultRole = defined('AD_BULK_IMPORT_ROLE') ? AD_BULK_IMPORT_ROLE : 'subscriber';
 
-        add_action('wpmu_new_blog', array($this, 'addUsersToNewBlog'), 10, 6);
-        add_action('ad_integration_add_users_to_site', array($this, 'addUsersToNewBlogCron'), 10, 1);
+        add_action('wpmu_new_blog', [$this, 'addUsersToNewBlog'], 10, 6);
+        add_action('ad_integration_add_users_to_site', [$this, 'addUsersToNewBlogCron'], 10, 1);
     }
 
-     /**
+    /**
      * Schedule a cron for new blog propagate.
      * @return void
      */
     public function addUsersToNewBlog()
     {
-        if (!defined('AD_BULK_IMPORT_PROPAGATE') || (defined('AD_BULK_IMPORT_PROPAGATE') && !AD_BULK_IMPORT_PROPAGATE)) {
+        if (!defined('AD_BULK_IMPORT_PROPAGATE') || defined('AD_BULK_IMPORT_PROPAGATE') && !AD_BULK_IMPORT_PROPAGATE) {
             return;
         }
 
         if (!wp_next_scheduled('ad_integration_add_users_to_site')) {
-            wp_schedule_single_event(time() + 5, 'ad_integration_add_users_to_site', array($blogId));
+            wp_schedule_single_event(time() + 5, 'ad_integration_add_users_to_site', [$blogId]);
         }
     }
 
@@ -42,10 +41,10 @@ class NewBlog
 
     public function addUsersToNewBlogCron($blogId)
     {
-        set_time_limit(60*60*60);
+        set_time_limit(60 * 60 * 60);
 
         global $wpdb;
-        $users = $wpdb->get_results("SELECT ID FROM $wpdb->users");
+        $users = $wpdb->get_results("SELECT ID FROM {$wpdb->users}");
 
         foreach ($users as $user) {
             $this->addDefaultRole($user->ID, $blogId);
@@ -59,10 +58,9 @@ class NewBlog
      */
     public function addDefaultRole($userId, $blogId = null)
     {
-
         //Get role (superadmin should always be administrator)
         if (is_super_admin($userId)) {
-            $role = "administrator";
+            $role = 'administrator';
         } else {
             $role = $this->defaultRole ? $this->defaultRole : 'subscriber';
         }

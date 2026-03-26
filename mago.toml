@@ -1,0 +1,40 @@
+# Welcome to Mago!
+# For full documentation, see https://mago.carthage.software/tools/overview
+php-version = "8.3.0"
+
+[source]
+paths = ["source/php/"]
+includes = ["vendor"]
+excludes = []
+
+[formatter]
+print-width = 999
+tab-width = 4
+use-tabs = false
+preserve-breaking-parameter-list = true
+preserve-breaking-argument-list = true
+preserve-breaking-array-like = true
+preserve-breaking-attribute-list = true
+
+[linter]
+integrations = ["phpunit"]
+
+[linter.rules]
+ambiguous-function-call = { enabled = false }
+literal-named-argument = { enabled = false }
+halstead = { effort-threshold = 7000 }
+
+no-empty = { level = "warning" }
+no-global = { level = "warning" }
+no-error-control-operator = { level = "warning" }
+too-many-methods = { level = "warning" }
+kan-defect = { level = "warning" }
+cyclomatic-complexity = { level = "warning" }
+
+[analyzer]
+find-unused-definitions = true
+find-unused-expressions = false
+analyze-dead-code = false
+check-throws = true
+allow-possibly-undefined-array-keys = true
+perform-heuristic-checks = true

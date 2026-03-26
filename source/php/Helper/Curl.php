@@ -16,7 +16,6 @@ class Curl
 
     public function request($type, $url, $data = null, $contentType = 'json', $headers = null)
     {
-
         //Arguments are stored here
         $arguments = null;
 
@@ -31,15 +30,15 @@ class Curl
                 }
 
                 // Set curl options for GET
-                $arguments = array(
-                    CURLOPT_RETURNTRANSFER      => true,
-                    CURLOPT_HEADER              => false,
-                    CURLOPT_FOLLOWLOCATION      => true,
-                    CURLOPT_SSL_VERIFYPEER      => false,
-                    CURLOPT_SSL_VERIFYHOST      => false,
-                    CURLOPT_URL                 => $url,
-                    CURLOPT_CONNECTTIMEOUT_MS  => 1500
-                );
+                $arguments = [
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_HEADER => false,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_SSL_VERIFYPEER => false,
+                    CURLOPT_SSL_VERIFYHOST => false,
+                    CURLOPT_URL => $url,
+                    CURLOPT_CONNECTTIMEOUT_MS => 1500,
+                ];
 
                 break;
 
@@ -48,18 +47,18 @@ class Curl
              */
             case 'POST':
                 // Set curl options for POST
-                $arguments = array(
-                    CURLOPT_RETURNTRANSFER      => 1,
-                    CURLOPT_URL                 => $url,
-                    CURLOPT_POST                => 1,
-                    CURLOPT_HEADER              => false,
-                    CURLOPT_CONNECTTIMEOUT_MS   => 3000
-                );
+                $arguments = [
+                    CURLOPT_RETURNTRANSFER => 1,
+                    CURLOPT_URL => $url,
+                    CURLOPT_POST => 1,
+                    CURLOPT_HEADER => false,
+                    CURLOPT_CONNECTTIMEOUT_MS => 3000,
+                ];
 
-                if (in_array($contentType, array("json", "jsonp"))) {
+                if (in_array($contentType, ['json', 'jsonp'])) {
                     $arguments[CURLOPT_POSTFIELDS] = json_encode($data);
                 } else {
-                    $arguments[CURLOPT_POSTFIELDS] = http_build_query($data) ;
+                    $arguments[CURLOPT_POSTFIELDS] = http_build_query($data);
                 }
 
                 break;
@@ -81,13 +80,13 @@ class Curl
         $response = curl_exec($ch);
 
         //Check if curl wen't trough
-        if($curlError = curl_error ($ch)) {
+        if ($curlError = curl_error($ch)) {
             return new \WP_Error(
                 'ad_api_connection_error',
-                $curlError
-            ); 
+                $curlError,
+            );
         }
-        
+
         //Close connection
         curl_close($ch);
 

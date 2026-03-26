@@ -24,26 +24,25 @@ class Format
      */
     public static function parseDisplayName($string, $data)
     {
-        $response = array();
+        $response = [];
 
         if (isset($data->sn) && !empty($data->sn)) {
-            $response['firstname'] = trim(str_replace($data->sn, "", substr($string, 0, strpos($string, " - "))));
+            $response['firstname'] = trim(str_replace($data->sn, '', substr($string, 0, strpos($string, ' - '))));
             $response['lastname'] = $data->sn;
-        } elseif (isset($data->mail) && strpos($data->mail, ".")) {
-            $response['firstname'] = trim(substr($data->mail, 0, strpos($data->mail, ".")));
-            $response['lastname'] = trim(substr($data->mail, strpos($data->mail, ".")+1, strpos($data->mail, "@")-strpos($data->mail, ".")-1));
+        } elseif (isset($data->mail) && strpos($data->mail, '.')) {
+            $response['firstname'] = trim(substr($data->mail, 0, strpos($data->mail, '.')));
+            $response['lastname'] = trim(substr($data->mail, strpos($data->mail, '.') + 1, strpos($data->mail, '@') - strpos($data->mail, '.') - 1));
         } else {
-            $tempData = array();
-            $tempData = trim(substr($string, 0, strpos($string, " - ")));
+            $tempData = [];
+            $tempData = trim(substr($string, 0, strpos($string, ' - ')));
 
             if (!empty($tempData)) {
-
-                $tempData = explode(" ", $tempData);
+                $tempData = explode(' ', $tempData);
 
                 if (is_array($tempData) && count($tempData)) {
                     $response['lastname'] = $tempData[0];
                     unset($tempData[0]);
-                    $response['firstname'] = implode(" ", $tempData);
+                    $response['firstname'] = implode(' ', $tempData);
                 }
             }
         }

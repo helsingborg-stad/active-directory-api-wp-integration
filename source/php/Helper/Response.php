@@ -10,9 +10,8 @@ class Response
      */
     public static function isJsonError($response)
     {
-
-        if(is_wp_error($response)) {
-            return true; 
+        if (is_wp_error($response)) {
+            return true;
         }
 
         if ($decoded = json_decode($response)) {
@@ -22,7 +21,7 @@ class Response
         if (isset($response['error'])) {
             return true;
         }
-        
+
         return false;
     }
 }

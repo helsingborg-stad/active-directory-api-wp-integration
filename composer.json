@@ -3,6 +3,12 @@
     "description": "Simple plugin for verification of existing WordPress users with api.",
     "type": "wordpress-plugin",
     "license": "MIT",
+    "scripts": {
+        "test": "./vendor/bin/phpunit --testdox",
+        "lint": "vendor/bin/mago lint",
+        "fix": "vendor/bin/mago lint --format-after-fix --fix",
+        "format": "vendor/bin/mago fmt"
+    },
     "authors": [
         {
             "name": "Sebastian Thulin",
@@ -12,9 +18,21 @@
     "require": {
         "helsingborg-stad/wpservice": "^2.0"
     },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "carthage-software/mago": "^1.14.1"
+    },
     "autoload": {
         "psr-4": {
             "adApiWpIntegration\\": "source/php/"
+        }
+    },
+    "suggest": {
+        "helsingborg-stad/municipio": "^6.0.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "carthage-software/mago": true
         }
     }
 }

@@ -2,7 +2,6 @@
 
 namespace adApiWpIntegration;
 
-use adApiWpIntegration\Input;
 use WpService\WpService;
 
 class App
@@ -17,9 +16,10 @@ class App
      * Init plugin with construct, only if constant is set and valid
      * @return void
      */
-    public function __construct(private Input $input, private WpService $wpService)
-    {
-
+    public function __construct(
+        private Input $input,
+        private WpService $wpService,
+    ) {
         //Do not run if undefined
         if (!defined('AD_INTEGRATION_URL')) {
             return false;
@@ -37,7 +37,7 @@ class App
         $this->defaultSettings();
 
         //Init
-        add_action('wp_authenticate', array($this, 'hijackLogin'), 20);
+        add_action('wp_authenticate', [$this, 'hijackLogin'], 20);
     }
 
     /**
@@ -58,7 +58,6 @@ class App
 
     public function defaultSettings()
     {
-
         //Update the users first and last name
         if (!defined('AD_UPDATE_NAME')) {
             define('AD_UPDATE_NAME', true);
@@ -76,7 +75,7 @@ class App
 
         //Update the users meta data
         if (!defined('AD_META_PREFIX')) {
-            define('AD_META_PREFIX', "ad_");
+            define('AD_META_PREFIX', 'ad_');
         }
 
         //Save the password entered by the user (this decreases the security)
@@ -96,7 +95,7 @@ class App
 
         //Bulk import default role
         if (!defined('AD_BULK_IMPORT_ROLE')) {
-            define('AD_BULK_IMPORT_ROLE', "subscriber");
+            define('AD_BULK_IMPORT_ROLE', 'subscriber');
         }
 
         //Propagate role
@@ -116,7 +115,7 @@ class App
 
         //Activate autocreate action
         if (!defined('AD_AUTOCREATE_ROLE')) {
-            define('AD_AUTOCREATE_ROLE', "subscriber");
+            define('AD_AUTOCREATE_ROLE', 'subscriber');
         }
     }
 
@@ -132,7 +131,7 @@ class App
         //Translate email login to username
         if (is_email($username)) {
             $username = $this->emailToUsername(
-                filter_var($username, FILTER_SANITIZE_EMAIL)
+                filter_var($username, FILTER_SANITIZE_EMAIL),
             );
         }
 
@@ -141,7 +140,7 @@ class App
         $this->password = $this->input->post('pwd');
 
         //Only assume thre's a existing user id if autocreate is off
-        if (!defined('AD_AUTOCREATE_USER') || (defined('AD_AUTOCREATE_USER') && AD_AUTOCREATE_USER === false)) {
+        if (!defined('AD_AUTOCREATE_USER') || defined('AD_AUTOCREATE_USER') && AD_AUTOCREATE_USER === false) {
             $this->userId = $this->getUserID($username);
 
             if (!is_numeric($this->userId)) {
@@ -162,10 +161,8 @@ class App
 
         //Abort if theres a error
         if ($result !== false) {
-
             //Validate signon
             if ($this->validateLogin($result, $this->username) && $result !== false) {
-
                 //Auto create a user account
                 if (defined('AD_AUTOCREATE_USER') && AD_AUTOCREATE_USER === true) {
                     Helper\AutoCreate::autoCreateUser($this->username, $this->password, $result);
@@ -178,17 +175,16 @@ class App
                 $this->profile->update($result, $this->userId);
 
                 //Signon
-                $this->signOn(array(
+                $this->signOn([
                     'user_login' => $this->username,
                     'user_password' => $this->password,
-                    'remember' => $this->input->get('rememberme') == "forever" ? true : false
-                ));
+                    'remember' => $this->input->get('rememberme') == 'forever' ? true : false,
+                ]);
 
                 //Redirect to admin panel / frontpage
                 if (in_array('subscriber', (array) get_userdata($this->userId)->roles)) {
-
                     //Get bulitin referer
-                    $referer = $this->input->get('_wp_http_referer') ?? "/";
+                    $referer = $this->input->get('_wp_http_referer') ?? '/';
 
                     //Redirect to correct url
                     if (is_multisite()) {
@@ -196,30 +192,30 @@ class App
                         wp_redirect(
                             apply_filters(
                                 'adApiWpIntegration/login/subscriberRedirect',
-                                $this->appendQueryString(network_home_url($referer), 'login', 'true')
-                            )
+                                $this->appendQueryString(network_home_url($referer), 'login', 'true'),
+                            ),
                         );
-                        exit;
+                        exit();
                     }
 
                     $this->sendNoCacheHeader();
                     wp_redirect(
                         apply_filters(
                             'adApiWpIntegration/login/subscriberRedirect',
-                            $this->appendQueryString(home_url($referer), 'login', 'true')
-                        )
+                            $this->appendQueryString(home_url($referer), 'login', 'true'),
+                        ),
                     );
-                    exit;
+                    exit();
                 }
 
                 $this->sendNoCacheHeader();
                 wp_redirect(
                     apply_filters(
                         'adApiWpIntegration/login/defaultRedirect',
-                        $this->appendQueryString(admin_url("?auth=active-directory"), 'login', 'true')
-                    )
+                        $this->appendQueryString(admin_url('?auth=active-directory'), 'login', 'true'),
+                    ),
                 );
-                exit;
+                exit();
             }
         }
     }
@@ -228,21 +224,20 @@ class App
      * Get information from the api-service
      * @return object / false
      */
-    private function fetchUser($username, $password)
+    private function fetchUser($username, #[\SensitiveParameter] $password)
     {
         if (!empty($username) && !empty($password)) {
-
             //Create login post data
-            $data = array(
+            $data = [
                 'username' => $username,
-                'password' => $password
-            );
+                'password' => $password,
+            ];
 
             //Json handler
             $response = new Helper\Response();
 
             //Make Curl
-            $result = $this->curl->request('POST', rtrim(constant('AD_INTEGRATION_URL'), "/") . '/user/current', $data, 'json', array('Content-Type: application/json'));
+            $result = $this->curl->request('POST', rtrim(constant('AD_INTEGRATION_URL'), '/') . '/user/current', $data, 'json', ['Content-Type: application/json']);
 
             //Is curl error
             if (is_wp_error($result)) {
@@ -337,9 +332,9 @@ class App
 
     /**
      * Translate email to username
-     * 
+     *
      * @param string|null $email
-     * 
+     *
      * @return string|null
      */
     private function emailToUsername($email = null)
@@ -355,14 +350,14 @@ class App
 
     /**
      * Send nocache header
-     * 
+     *
      * @return void
      */
     private function sendNoCacheHeader(): void
     {
-        header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-        header("Cache-Control: post-check=0, pre-check=0", false);
-        header("Pragma: no-cache");
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Cache-Control: post-check=0, pre-check=0', false);
+        header('Pragma: no-cache');
     }
 
     /**
@@ -375,9 +370,9 @@ class App
      */
     private function appendQueryString($url, $queryParameter, $queryValue)
     {
-        $url                = esc_url_raw($url);
-        $queryParameter     = sanitize_key($queryParameter);
-        $queryValue         = rawurlencode($queryValue);
+        $url = esc_url_raw($url);
+        $queryParameter = sanitize_key($queryParameter);
+        $queryValue = rawurlencode($queryValue);
 
         if (strpos($url, '?') !== false) {
             $url .= '&' . $queryParameter . '=' . $queryValue;
