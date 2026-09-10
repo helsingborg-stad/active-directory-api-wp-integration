@@ -1,6 +1,6 @@
 {
     "name": "adintegration",
-    "version": "3.2.0",
+    "version": "3.2.2",
     "description": "Integration with the simple active directory api service",
     "main": "",
     "scripts": {
