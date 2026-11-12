@@ -6,6 +6,8 @@ Integration with the simple active directory api service (https://github.com/hel
 - Use the password stored in active-directory for matching WordPress users. 
 - Update of users basic data like email, first name and last name on login. 
 
+The wpservice 3.0.0 dependency supports PHP 8.2 through 8.5.
+
 # Database modifications
 This plugin will alter the index of the user table to require unique usernames. This is not a default behavior for WordPress and may break other plugins related to user management. 
 
